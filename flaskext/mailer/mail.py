@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from email.mime.text import MIMEText
 
-from flaskext.mailer.compat import string_types
+from flaskext.mailer.compat import string_types, text_type
 
 
 def to_list(el):
@@ -13,7 +13,7 @@ def to_list(el):
 
 
 def utf8(s):
-    return s.encode('utf-8') if isinstance(s, unicode) else s
+    return s.encode('utf-8') if isinstance(s, text_type) else s
 
 
 class Email(object):
