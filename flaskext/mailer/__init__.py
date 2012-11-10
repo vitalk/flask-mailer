@@ -80,9 +80,9 @@ class Mailer(object):
 
         # use dummy mailer for testing config
         if config[key('TESTING')]:
-            mailer = init_mailer(prefix, config, 'flaskext.mailer.backends.dummy.DummyMailer')
-        else:
-            mailer = init_mailer(prefix, config)
+            config[key('BACKEND')] = 'flaskext.mailer.backends.dummy.DummyMailer'
+
+        mailer = init_mailer(prefix, config)
         app.extensions['mailer'][prefix] = mailer
 
     def send(self, mail):
