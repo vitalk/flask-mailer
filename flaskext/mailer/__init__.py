@@ -1,11 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from functools import wraps
 from flask import current_app
 
 from flaskext.mailer.mail import Email
 from werkzeug.utils import import_string
-# from flaskext.utils import import_module
 
 
 __all__ = ('get_mailer', 'send_email', 'Mailer', 'Email')
