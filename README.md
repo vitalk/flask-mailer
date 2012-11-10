@@ -12,7 +12,7 @@ Includes different mailer backends for different purposes:
 ## Installation
 
 ```bash
-pip install flask-mailer
+pip install -e git+git://github.com/vitalk/flask-mailer.git#egg=flask-mailer
 ```
 
 ## Configuration
