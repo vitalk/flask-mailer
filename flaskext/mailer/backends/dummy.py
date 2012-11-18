@@ -16,5 +16,5 @@ class DummyMailer(Mailer):
         self.outbox.append(message)
 
     def send_quiet(self, message):
-        """Actually don't shallow exception."""
+        """Actually don't swallow exception."""
         self.send(message)
