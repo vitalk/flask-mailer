@@ -80,7 +80,7 @@ class Email(object):
            not self.to_addrs or not self.from_addr:
             raise RuntimeError('Fill in mailing parameters first')
 
-        msg = MIMEText(self.text.encode('utf-8'))
+        msg = MIMEText(utf8(self.text))
 
         # really MIMEText is sucks, it does not override values on setitem,
         # it appends them. Remove some predefined fields
