@@ -101,8 +101,8 @@ def app_context():
     from flaskext.mailer import Mailer
     mailer = Mailer(app)
 
-    @app.route('/')
-    def index():
+    @app.route('/send')
+    def send():
         mail = Email('hi!', 'awesome message', 'to@example.com', 'me@example.com')
         mailer.send(mail)
         return 'well done'
@@ -124,7 +124,7 @@ def dummy_send():
 @dummy.test
 def dummy_init(app):
     with app.test_client() as c:
-        c.get('/')
+        c.get('/send')
         mailer = get_mailer()
         assert len(mailer.outbox) == 1
         assert mailer.outbox[0].subject == 'hi!'
