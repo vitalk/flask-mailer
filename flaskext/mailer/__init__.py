@@ -11,6 +11,10 @@ __all__ = ('get_mailer', 'send_email', 'Mailer', 'Email')
 DEFAULT_PREFIX = 'MAILER'
 
 
+key = lambda prefix, suffix: '%s_%s' % (prefix, suffix)
+"""Returns config key name composed from prefix and suffix."""
+
+
 def send_email(subject, text, to_addrs, fail_quiet=True, prefix=DEFAULT_PREFIX):
     """Send an email."""
     mailer = get_mailer(prefix)
@@ -37,11 +41,11 @@ def get_mailer(prefix=DEFAULT_PREFIX):
 def init_mailer(prefix=DEFAULT_PREFIX, config=None, backend=None):
     """Create new mailer from config."""
     config = config or {}
-    path = backend or config.get('%s_%s' % (DEFAULT_PREFIX, 'BACKEND'))
+    path = backend or config[key(prefix, 'BACKEND')]
     module_name, klass_name = path.rsplit('.', 1)
     module = import_string(module_name)
     klass = getattr(module, klass_name)
-    return klass.from_settings(config, prefix + '_')
+    return klass.from_settings(config, prefix)
 
 
 class Mailer(object):
