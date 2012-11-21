@@ -42,10 +42,10 @@ def init_mailer(prefix=DEFAULT_PREFIX, config=None, backend=None):
     """Create new mailer from config."""
     config = config or {}
     path = backend or config[key(prefix, 'BACKEND')]
-    module_name, klass_name = path.rsplit('.', 1)
+    module_name, cls_name = path.rsplit('.', 1)
     module = import_string(module_name)
-    klass = getattr(module, klass_name)
-    return klass.from_settings(config, prefix)
+    cls = getattr(module, cls_name)
+    return cls.from_settings(config, prefix)
 
 
 class Mailer(object):
