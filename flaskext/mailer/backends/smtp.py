@@ -78,7 +78,7 @@ class SMTPMailer(Mailer):
     def from_settings(cls, settings, prefix):
         allowed_kwds = ('host', 'port', 'username', 'password', 'use_tls',
                         'default_sender')
-        super(SMTPMailer, cls).from_settings(settings, prefix, allowed_kwds)
+        return super(SMTPMailer, cls).from_settings(settings, prefix, allowed_kwds)
 
 
 if __name__ == '__main__':
