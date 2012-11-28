@@ -38,14 +38,25 @@ def get_mailer(prefix=DEFAULT_PREFIX):
     return mailer
 
 
-def init_mailer(prefix=DEFAULT_PREFIX, config=None, backend=None):
+def init_mailer(prefix, config=None):
     """Create new mailer from config."""
     config = config or {}
-    path = backend or config[key(prefix, 'BACKEND')]
-    module_name, cls_name = path.rsplit('.', 1)
-    module = import_string(module_name)
-    cls = getattr(module, cls_name)
+    path = config.get(key(prefix, 'BACKEND'), None)
+    cls = to_class(path)
+    if cls is None:
+        raise RuntimeError("Invalid backend: '%s'" % path)
+
     return cls.from_settings(config, prefix)
+
+
+def to_class(path):
+    """Returns object imported from path."""
+    if not path:
+        return
+
+    module_name, class_name = path.rsplit('.', 1)
+    module = import_string(module_name, silent=True)
+    return getattr(module, class_name, None)
 
 
 class Mailer(object):
