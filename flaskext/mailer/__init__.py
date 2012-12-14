@@ -63,7 +63,6 @@ class Mailer(object):
     """Mailer instance manages sending of email messages."""
 
     def __init__(self, app=None, prefix=DEFAULT_PREFIX):
-        self.app = app
         if app is not None:
             self.init_app(app, prefix)
 
