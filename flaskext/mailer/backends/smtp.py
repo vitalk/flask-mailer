@@ -32,7 +32,6 @@ class SMTPMailer(Mailer):
         """Acquires the connection to SMTP server."""
         try:
             connection = self.connection = SMTP(self.host, self.port)
-            connection.set_debuglevel(int(self.app.debug))
             if self.username and self.password:
                 connection.login(self.username, self.password)
             if self.use_tls:
