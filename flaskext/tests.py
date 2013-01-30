@@ -172,12 +172,21 @@ def smtp_default_init():
 
 @smtp.test
 def smtp_send():
-    mailer = init_smtp_mailer()
+    mailer = init_smtp_mailer(host='localhost', port=6666)
     mail = Email('hello', 'awesome message',
                  to_addrs=['to@you', 'you@again'],
                  from_addr='from@me')
     with raises(RuntimeError):
         mailer.send(mail)
+
+
+@smtp.test
+def smtp_send_quiet():
+    mailer = init_smtp_mailer(host='localhost', port=6666)
+    mail = Email('hello', 'awesome message',
+                 to_addrs=['to@you', 'you@again'],
+                 from_addr='from@me')
+    mailer.send_quiet(mail)
 
 
 suite = Tests(tests=(mail, base, dummy, smtp))
