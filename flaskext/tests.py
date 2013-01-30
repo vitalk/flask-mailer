@@ -146,18 +146,17 @@ def dummy_init(app):
 smtp = Tests()
 
 
-def init_smtp_mailer(config=None):
+def init_smtp_mailer(**config):
     from flaskext.mailer.backends.smtp import SMTPMailer
-    config = config or {}
     return SMTPMailer(**config)
 
 
 @smtp.test
 def smtp_bad_auth():
     with raises(RuntimeError):
-        init_smtp_mailer(dict(username='me'))
+        init_smtp_mailer(username='me')
     with raises(RuntimeError):
-        init_smtp_mailer(dict(password='my'))
+        init_smtp_mailer(password='my')
 
 
 @smtp.test
