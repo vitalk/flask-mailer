@@ -50,8 +50,7 @@ class SMTPMailer(Mailer):
                 # sometimes.
                 self.connection.close()
             except:
-                if not self.fail_quiet:
-                    return False
+                return False
         finally:
             self.connection = None
             return True
