@@ -5,8 +5,6 @@ from flaskext.mailer import key
 
 class Mailer(object):
     """Base email backend manager."""
-    def __init__(self, fail_quiet=False, **kwds):
-        self.fail_quiet = fail_quiet
 
     def send(self, message):
         """Send the email message."""

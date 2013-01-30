@@ -98,7 +98,6 @@ base = Tests()
 def base_nonimplemented_methods():
     from flaskext.mailer.backends.base import Mailer
     mailer = Mailer()
-    assert mailer.fail_quiet == False
     with raises(NotImplementedError):
         mailer.send(None)
     with raises(NotImplementedError):
@@ -170,7 +169,6 @@ def smtp_default_init():
     assert mailer.password == None
     assert mailer.default_sender == None
     assert mailer.use_tls == False
-    assert mailer.fail_quiet == False
 
 
 @smtp.test

@@ -14,9 +14,7 @@ class SMTPMailer(Mailer):
                  username=None,
                  password=None,
                  default_sender=None,
-                 use_tls=False,
-                 fail_quiet=False):
-        super(SMTPMailer, self).__init__(fail_quiet=fail_quiet)
+                 use_tls=False):
         self.host = host
         self.port = port
         self.use_tls = use_tls
