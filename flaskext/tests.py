@@ -91,6 +91,20 @@ def mail_to_message_with_blank_mailing_params():
         assert e.message == 'Fill in mailing parameters first'
 
 
+base = Tests()
+
+
+@base.test
+def base_nonimplemented_methods():
+    from flaskext.mailer.backends.base import Mailer
+    mailer = Mailer()
+    assert mailer.fail_quiet == False
+    with raises(NotImplementedError):
+        mailer.send(None)
+    with raises(NotImplementedError):
+        mailer.send_quiet(None)
+
+
 dummy = Tests()
 
 
@@ -130,7 +144,46 @@ def dummy_init(app):
         assert mailer.outbox[0].subject == 'hi!'
 
 
-suite = Tests(tests=(mail, dummy))
+smtp = Tests()
+
+
+def init_smtp_mailer(config=None):
+    from flaskext.mailer.backends.smtp import SMTPMailer
+    config = config or {}
+    return SMTPMailer(**config)
+
+
+@smtp.test
+def smtp_bad_auth():
+    with raises(RuntimeError):
+        init_smtp_mailer(dict(username='me'))
+    with raises(RuntimeError):
+        init_smtp_mailer(dict(password='my'))
+
+
+@smtp.test
+def smtp_default_init():
+    mailer = init_smtp_mailer()
+    assert mailer.host == 'localhost'
+    assert mailer.port == 25
+    assert mailer.username == None
+    assert mailer.password == None
+    assert mailer.default_sender == None
+    assert mailer.use_tls == False
+    assert mailer.fail_quiet == False
+
+
+@smtp.test
+def smtp_send():
+    mailer = init_smtp_mailer()
+    mail = Email('hello', 'awesome message',
+                 to_addrs=['to@you', 'you@again'],
+                 from_addr='from@me')
+    with raises(RuntimeError):
+        mailer.send(mail)
+
+
+suite = Tests(tests=(mail, base, dummy, smtp))
 
 
 if __name__ == '__main__':
