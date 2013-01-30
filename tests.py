@@ -111,8 +111,12 @@ dummy = Tests()
 def app_context():
     app = Flask(__name__)
     app.testing = True
+
+    key = lambda s: 'FOO_%s' % s
+    app.config[key('BACKEND')] = 'flaskext.mailer.backends.dummy.DummyMailer'
+
     from flaskext.mailer import Mailer
-    mailer = Mailer(app)
+    mailer = Mailer(app, prefix='FOO')
 
     @app.route('/send')
     def send():
@@ -138,7 +142,7 @@ def dummy_send():
 def dummy_init(app):
     with app.test_client() as c:
         c.get('/send')
-        mailer = get_mailer()
+        mailer = get_mailer('FOO')
         assert len(mailer.outbox) == 1
         assert mailer.outbox[0].subject == 'hi!'
 
