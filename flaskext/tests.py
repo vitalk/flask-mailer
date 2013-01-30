@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from attest import Tests, AssertImportHook, raises
+from attest import Tests, AssertImportHook, raises, assert_hook
 
 # disable assert hook before load flask app, while pull-request will be
 # accepted https://github.com/dag/attest/pull/136
