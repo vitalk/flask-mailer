@@ -33,7 +33,6 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-        'Topic :: Software Development :: Libraries :: Python Modules'
-        'Framework :: Flask'
+        'Topic :: Software Development :: Libraries :: Python Modules',
     ]
 )
