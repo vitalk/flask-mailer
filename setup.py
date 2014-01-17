@@ -12,17 +12,21 @@ from setuptools import setup, Command
 
 
 class pytest(Command):
-    user_options = []
+    user_options = [
+        ('coverage', None, 'report coverage')
+    ]
 
     def initialize_options(self):
-        pass
+        self.coverage = None
 
     def finalize_options(self):
         pass
 
     def run(self):
-        basecmd = [sys.executable, '-m', 'pytest', 'tests']
-        errno = subprocess.call(basecmd)
+        basecmd = [sys.executable, '-m', 'pytest']
+        if self.coverage:
+            basecmd += ['--cov', 'flaskext/mailer']
+        errno = subprocess.call(basecmd + ['tests'])
         raise SystemExit(errno)
 
 
@@ -40,7 +44,7 @@ setup(
     ],
     namespace_packages=['flaskext'],
     install_requires=['Flask'],
-    tests_require=['pytest'],
+    tests_require=['pytest', 'pytest-cov'],
     cmdclass={'test': pytest},
     classifiers=[
         'Environment :: Web Environment',
