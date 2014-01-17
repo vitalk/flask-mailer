@@ -23,9 +23,7 @@ setup(
     ],
     namespace_packages=['flaskext'],
     install_requires=['Flask'],
-    tests_require=['Attest'],
-    test_loader='attest:auto_reporter.test_loader',
-    test_suite='tests.suite',
+    tests_require=['pytest'],
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
