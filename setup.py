@@ -6,7 +6,28 @@ flask-mailer
 
 A Flask extension for sending emails.
 """
-from setuptools import setup
+import sys
+import subprocess
+from setuptools import setup, Command
+
+
+class pytest(Command):
+    user_options = [
+        ('coverage', None, 'report coverage')
+    ]
+
+    def initialize_options(self):
+        self.coverage = None
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        basecmd = [sys.executable, '-m', 'pytest']
+        if self.coverage:
+            basecmd += ['--cov', 'flaskext/mailer']
+        errno = subprocess.call(basecmd + ['tests'])
+        raise SystemExit(errno)
 
 
 setup(
@@ -23,9 +44,8 @@ setup(
     ],
     namespace_packages=['flaskext'],
     install_requires=['Flask'],
-    tests_require=['Attest'],
-    test_loader='attest:auto_reporter.test_loader',
-    test_suite='tests.suite',
+    tests_require=['pytest', 'pytest-cov'],
+    cmdclass={'test': pytest},
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
