@@ -19,9 +19,9 @@ def send_email(subject, text, to_addrs, fail_quiet=True):
     return mailer.send(mail)
 
 
-def get_mailer():
+def get_mailer(state):
     """Returns mailer for current app or raise RuntimeError."""
-    app = current_app
+    app = getattr(state, 'app', None) or current_app
 
     if not hasattr(app, 'extensions') or \
        'mailer' not in app.extensions:
@@ -45,13 +45,10 @@ class Mailer(object):
     """Mailer instance manages sending of email messages."""
 
     def __init__(self, app=None):
-        if app is not None:
-            self.init_app(app)
+        self.app = app
+        self.state = None if app is None else self.init_app(app)
 
     def init_app(self, app):
-        # register extension themselves for backwards compatibility
-        app.extensions = getattr(app, 'extensions', {})
-
         # set default settings
         config = app.config
         config.setdefault(key('testing'), app.testing)
@@ -68,15 +65,14 @@ class Mailer(object):
             config[key('backend')] = 'flask.ext.mailer.backends.dummy.DummyMailer'
 
         state = init_mailer(config)
+
+        # register extension themselves for backwards compatibility
+        app.extensions = getattr(app, 'extensions', {})
         app.extensions['mailer'] = state
+        return state
 
-    def send(self, mail):
-        """Send the email message."""
-        get_mailer(self.state).send(mail)
-
-    def send_quiet(self, mail):
-        """Send the email message but swallow exceptions."""
-        get_mailer(self.state).send_quiet(mail)
+    def __getattr__(self, name):
+        return getattr(get_mailer(self), name, None)
 
 
 if __name__ == '__main__':
