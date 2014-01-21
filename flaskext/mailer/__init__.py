@@ -46,7 +46,7 @@ def init_mailer(prefix, config=None):
     if cls is None:
         raise RuntimeError("Invalid backend: '%s'" % path)
 
-    return cls.from_settings(config, prefix)
+    return cls(**config)
 
 
 def to_class(path):

@@ -71,12 +71,6 @@ class SMTPMailer(Mailer):
         except Exception:
             return
 
-    @classmethod
-    def from_settings(cls, settings, prefix):
-        allowed_kwds = ('host', 'port', 'username', 'password', 'use_tls',
-                        'default_sender')
-        return super(SMTPMailer, cls).from_settings(settings, prefix, allowed_kwds)
-
 
 if __name__ == '__main__':
     import doctest
