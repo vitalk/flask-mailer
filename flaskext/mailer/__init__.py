@@ -4,7 +4,7 @@ from flask import current_app
 
 from flaskext.mailer.mail import Email
 from flask.ext.mailer.util import key
-from werkzeug.utils import import_string
+from flask.ext.mailer.util import import_path
 
 
 __all__ = ('get_mailer', 'send_email', 'Mailer', 'Email')
@@ -39,21 +39,11 @@ def init_mailer(prefix, config=None):
     """Create new mailer from config."""
     config = config or {}
     path = config.pop(key('backend'), None)
-    cls = to_class(path)
+    cls = import_path(path)
     if cls is None:
         raise RuntimeError("Invalid backend: '%s'" % path)
 
     return cls(**config)
-
-
-def to_class(path):
-    """Returns object imported from path."""
-    if not path:
-        return
-
-    module_name, class_name = path.rsplit('.', 1)
-    module = import_string(module_name, silent=True)
-    return getattr(module, class_name, None)
 
 
 class Mailer(object):
