@@ -26,7 +26,9 @@ def get_mailer(state):
 
     if not hasattr(app, 'extensions') or \
        'mailer' not in app.extensions:
-        raise RuntimeError('Mailer extension does not registered')
+        raise RuntimeError('Mailer extension does not registered '
+                           'with current application or no application bound '
+                           'to current context')
 
     return app.extensions['mailer']
 
