@@ -14,7 +14,8 @@ class SMTPMailer(Mailer):
                  username=None,
                  password=None,
                  default_sender=None,
-                 use_tls=False):
+                 use_tls=False,
+                 **kwargs):
         self.host = host
         self.port = port
         self.use_tls = use_tls

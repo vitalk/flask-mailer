@@ -8,7 +8,7 @@ class DummyMailer(Mailer):
 
     Keeps all sent messages in *oubox* list.
     """
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.outbox = []
 
     def send(self, message):
