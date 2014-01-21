@@ -4,6 +4,7 @@ from flask import current_app
 
 from flaskext.mailer.mail import Email
 from flask.ext.mailer.util import key
+from flask.ext.mailer.util import get_config
 from flask.ext.mailer.util import import_path
 
 
@@ -30,15 +31,16 @@ def get_mailer(state):
     return app.extensions['mailer']
 
 
-def init_mailer(config=None):
-    """Create new mailer from config."""
-    config = config or {}
-    path = config.pop(key('backend'), None)
-    cls = import_path(path)
-    if cls is None:
+def init_mailer(options=None):
+    """Create a new mailer from options."""
+    options = get_config(options or {})
+
+    path = options.pop('backend', None)
+    backend_class = import_path(path)
+    if backend_class is None:
         raise RuntimeError("Invalid backend: '%s'" % path)
 
-    return cls(**config)
+    return backend_class(**options)
 
 
 class Mailer(object):
