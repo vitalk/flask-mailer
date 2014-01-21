@@ -2,6 +2,8 @@
 # -*- config coding: utf-8 -*-
 from werkzeug.utils import import_string
 
+from flask.ext.mailer.compat import iteritems
+
 
 def key(name): return ('MAILER_%s' % name).upper()
 """Returns uppercased config key for extension."""
@@ -16,6 +18,16 @@ def strip_prefix(prefix, string):
     if string.startswith(prefix):
         return string[len(prefix):]
     return string
+
+
+def get_config(config):
+    """Returns the config without the annoying prefix and with lowercase keys.
+
+    :param config: The config dictionary to inspect.
+    """
+    prefix = 'MAILER_'
+    return {strip_prefix(prefix, name).lower(): value
+            for name, value in iteritems(config) if name.startswith(prefix) }
 
 
 def import_path(path):
