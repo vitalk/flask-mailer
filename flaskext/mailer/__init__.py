@@ -3,16 +3,13 @@
 from flask import current_app
 
 from flaskext.mailer.mail import Email
+from flask.ext.mailer.util import key
 from werkzeug.utils import import_string
 
 
 __all__ = ('get_mailer', 'send_email', 'Mailer', 'Email')
 
 DEFAULT_PREFIX = 'MAILER'
-
-
-key = lambda prefix, suffix: '%s_%s' % (prefix, suffix)
-"""Returns config key name composed from prefix and suffix."""
 
 
 def send_email(subject, text, to_addrs, fail_quiet=True, prefix=DEFAULT_PREFIX):
@@ -41,7 +38,7 @@ def get_mailer(prefix=DEFAULT_PREFIX):
 def init_mailer(prefix, config=None):
     """Create new mailer from config."""
     config = config or {}
-    path = config.get(key(prefix, 'BACKEND'), None)
+    path = config.pop(key('backend'), None)
     cls = to_class(path)
     if cls is None:
         raise RuntimeError("Invalid backend: '%s'" % path)
@@ -76,8 +73,6 @@ class Mailer(object):
         self.app = app
         self.prefix = prefix
 
-        key = lambda suffix: '%s_%s' % (prefix, suffix)
-        """Key function returns proper config key."""
 
         # set default settings
         config = app.config
