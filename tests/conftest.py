@@ -11,7 +11,7 @@ def create_app(**options):
     :param **options: The additional application options.
     """
     app = Flask(__name__)
-    app.config.from_object(options)
+    app.config.update(options)
     return app
 
 
