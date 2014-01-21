@@ -76,18 +76,18 @@ class Mailer(object):
 
         # set default settings
         config = app.config
-        config.setdefault(key('TESTING'), app.testing)
-        config.setdefault(key('HOST'), 'localhost')
-        config.setdefault(key('PORT'), 25)
-        config.setdefault(key('USE_TLS'), False)
-        config.setdefault(key('USERNAME'), None)
-        config.setdefault(key('PASSWORD'), None)
-        config.setdefault(key('DEFAULT_SENDER'), 'webmaster')
-        config.setdefault(key('BACKEND'), 'flaskext.mailer.backends.smtp.SMTPMailer')
+        config.setdefault(key('testing'), app.testing)
+        config.setdefault(key('host'), 'localhost')
+        config.setdefault(key('port'), 25)
+        config.setdefault(key('use_tls'), False)
+        config.setdefault(key('username'), None)
+        config.setdefault(key('password'), None)
+        config.setdefault(key('default_sender'), 'webmaster')
+        config.setdefault(key('backend'), 'flask.ext.mailer.backends.smtp.SMTPMailer')
 
         # use dummy mailer for testing config
-        if config[key('TESTING')]:
-            config[key('BACKEND')] = 'flaskext.mailer.backends.dummy.DummyMailer'
+        if config[key('testing')]:
+            config[key('backend')] = 'flask.ext.mailer.backends.dummy.DummyMailer'
 
         mailer = init_mailer(prefix, config)
         app.extensions['mailer'][prefix] = mailer
