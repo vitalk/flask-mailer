@@ -14,7 +14,8 @@ class SMTPMailer(Mailer):
                  username=None,
                  password=None,
                  default_sender=None,
-                 use_tls=False):
+                 use_tls=False,
+                 **kwargs):
         self.host = host
         self.port = port
         self.use_tls = use_tls
@@ -69,12 +70,6 @@ class SMTPMailer(Mailer):
             return self.send(message)
         except Exception:
             return
-
-    @classmethod
-    def from_settings(cls, settings, prefix):
-        allowed_kwds = ('host', 'port', 'username', 'password', 'use_tls',
-                        'default_sender')
-        return super(SMTPMailer, cls).from_settings(settings, prefix, allowed_kwds)
 
 
 if __name__ == '__main__':

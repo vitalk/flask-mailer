@@ -3,107 +3,80 @@
 from flask import current_app
 
 from flaskext.mailer.mail import Email
-from werkzeug.utils import import_string
+from flask.ext.mailer.util import key
+from flask.ext.mailer.util import get_config
+from flask.ext.mailer.util import import_path
 
 
 __all__ = ('get_mailer', 'send_email', 'Mailer', 'Email')
 
-DEFAULT_PREFIX = 'MAILER'
 
-
-key = lambda prefix, suffix: '%s_%s' % (prefix, suffix)
-"""Returns config key name composed from prefix and suffix."""
-
-
-def send_email(subject, text, to_addrs, fail_quiet=True, prefix=DEFAULT_PREFIX):
+def send_email(subject, text, to_addrs, fail_quiet=True):
     """Send an email."""
-    mailer = get_mailer(prefix)
+    mailer = get_mailer(None)
     mail = Email(subject, text, to_addrs)
     if fail_quiet:
         return mailer.send_quiet(mail)
     return mailer.send(mail)
 
 
-def get_mailer(prefix=DEFAULT_PREFIX):
+def get_mailer(state):
     """Returns mailer for current app or raise RuntimeError."""
-    app = current_app
+    app = getattr(state, 'app', None) or current_app
 
     if not hasattr(app, 'extensions') or \
        'mailer' not in app.extensions:
-        raise RuntimeError('Mailer extension does not registered')
+        raise RuntimeError('Mailer extension does not registered '
+                           'with current application or no application bound '
+                           'to current context')
 
-    mailer = app.extensions['mailer'].get(prefix)
-    if mailer is None:
-        raise RuntimeError('Mailer with prefix "%s" does not exist' % prefix)
-    return mailer
+    return app.extensions['mailer']
 
 
-def init_mailer(prefix, config=None):
-    """Create new mailer from config."""
-    config = config or {}
-    path = config.get(key(prefix, 'BACKEND'), None)
-    cls = to_class(path)
-    if cls is None:
+def init_mailer(options=None):
+    """Create a new mailer from options."""
+    options = get_config(options or {})
+
+    path = options.pop('backend', None)
+    backend_class = import_path(path)
+    if backend_class is None:
         raise RuntimeError("Invalid backend: '%s'" % path)
 
-    return cls.from_settings(config, prefix)
-
-
-def to_class(path):
-    """Returns object imported from path."""
-    if not path:
-        return
-
-    module_name, class_name = path.rsplit('.', 1)
-    module = import_string(module_name, silent=True)
-    return getattr(module, class_name, None)
+    return backend_class(**options)
 
 
 class Mailer(object):
     """Mailer instance manages sending of email messages."""
 
-    def __init__(self, app=None, prefix=DEFAULT_PREFIX):
-        if app is not None:
-            self.init_app(app, prefix)
-
-    def init_app(self, app, prefix=DEFAULT_PREFIX):
-        # register extension themselves for backwards compatibility
-        app.extensions = getattr(app, 'extensions', {})
-        app.extensions['mailer'] = getattr(app.extensions, 'mailer', {})
-        if prefix in app.extensions['mailer']:
-            raise RuntimeError('duplicate config prefix: "%s"' % prefix)
-
+    def __init__(self, app=None):
         self.app = app
-        self.prefix = prefix
+        self.state = None if app is None else self.init_app(app)
 
-        key = lambda suffix: '%s_%s' % (prefix, suffix)
-        """Key function returns proper config key."""
-
+    def init_app(self, app):
         # set default settings
         config = app.config
-        config.setdefault(key('TESTING'), app.testing)
-        config.setdefault(key('HOST'), 'localhost')
-        config.setdefault(key('PORT'), 25)
-        config.setdefault(key('USE_TLS'), False)
-        config.setdefault(key('USERNAME'), None)
-        config.setdefault(key('PASSWORD'), None)
-        config.setdefault(key('DEFAULT_SENDER'), 'webmaster')
-        config.setdefault(key('BACKEND'), 'flaskext.mailer.backends.smtp.SMTPMailer')
+        config.setdefault(key('testing'), app.testing)
+        config.setdefault(key('host'), 'localhost')
+        config.setdefault(key('port'), 25)
+        config.setdefault(key('use_tls'), False)
+        config.setdefault(key('username'), None)
+        config.setdefault(key('password'), None)
+        config.setdefault(key('default_sender'), 'webmaster')
+        config.setdefault(key('backend'), 'flask.ext.mailer.backends.smtp.SMTPMailer')
 
         # use dummy mailer for testing config
-        if config[key('TESTING')]:
-            config[key('BACKEND')] = 'flaskext.mailer.backends.dummy.DummyMailer'
+        if config[key('testing')]:
+            config[key('backend')] = 'flask.ext.mailer.backends.dummy.DummyMailer'
 
-        mailer = init_mailer(prefix, config)
-        app.extensions['mailer'][prefix] = mailer
+        state = init_mailer(config)
 
-    def send(self, mail):
-        """Send the email message."""
-        get_mailer(self.prefix).send(mail)
+        # register extension themselves for backwards compatibility
+        app.extensions = getattr(app, 'extensions', {})
+        app.extensions['mailer'] = state
+        return state
 
-    def send_quiet(self, mail):
-        """Send the email message but swallow exceptions."""
-        get_mailer(self.prefix).send_quiet(mail)
+    def __getattr__(self, name):
+        return getattr(get_mailer(self), name, None)
 
 
 if __name__ == '__main__':
