@@ -3,6 +3,7 @@
 import pytest
 
 from flask.ext.mailer import Mailer
+from flask.ext.mailer import send_email
 from flask.ext.mailer.util import key
 
 from .test_mail import mail
@@ -69,3 +70,14 @@ def test_extension_use_the_application_bound_to_the_current_context(app, mail):
 def test_extension_send_mail(dummy, mail):
     dummy.send(mail)
     assert dummy.outbox == [mail,]
+
+
+def test_send_email_shortcut(app, dummy, mail):
+    with app.test_request_context():
+        send_email(mail.subject, mail.text, mail.to_addrs)
+
+    assert len(dummy.outbox) == 1
+    sent = dummy.outbox[0]
+    assert sent.subject == mail.subject
+    assert sent.text == mail.text
+    assert sent.to_addrs == mail.to_addrs
