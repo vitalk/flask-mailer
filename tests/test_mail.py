@@ -3,6 +3,7 @@
 import pytest
 
 from flask.ext.mailer import Email
+from flask.ext.mailer.mail import Address
 
 
 @pytest.fixture
@@ -15,6 +16,28 @@ def mail():
                  cc='cc@example.com',
                  bcc='bcc@example.com',
                  reply_to='noreply@wonderland.com')
+
+
+@pytest.fixture
+def alice():
+    return Address('alice@example.com')
+
+
+class TestAddress:
+
+    def test_address_init(self, alice):
+        assert alice.address == 'alice@example.com'
+        assert alice.format() == 'alice@example.com'
+        assert unicode(alice) == u'alice@example.com'
+        assert str(alice) == 'alice@example.com'
+
+    def test_unpack_address_from_list(self):
+        addr = Address(['Alice', 'alice@example.com'])
+        assert addr.format() == u'Alice <alice@example.com>'
+
+    def test_unpack_address_from_tuple(self):
+        addr = Address(('Alice', 'alice@example.com'))
+        assert addr.format() == u'Alice <alice@example.com>'
 
 
 def test_mail_init(mail):

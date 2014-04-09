@@ -16,6 +16,27 @@ def utf8(s):
     return s.encode('utf-8') if isinstance(s, text_type) else s
 
 
+class Address(object):
+    """A wrapper for email address.
+
+    :param address: The email address
+    """
+
+    def __init__(self, address):
+        self.address = address
+
+    def format(self):
+        if isinstance(self.address, (list, tuple)):
+            return u'{} <{}>'.format(*self.address)
+        return self.address
+
+    def __str__(self):
+        return self.format()
+
+    def __unicode__(self):
+        return utf8(str(self))
+
+
 class Email(object):
     """Base class for email messages.
 
