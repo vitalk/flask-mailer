@@ -36,6 +36,22 @@ class Address(object):
     def __unicode__(self):
         return utf8(str(self))
 
+    def __eq__(self, obj):
+        if isinstance(obj, Address):
+            return text_type(self) == text_type(obj)
+        elif isinstance(obj, string_types):
+            return text_type(self) == obj
+        elif isinstance(obj, (list, tuple)):
+            return text_type(self) == Address(obj)
+        raise NotImplementedError('Unable to compare Address instance '
+                                  'against {} instance'.format(type(obj)))
+
+    def __ne__(self, obj):
+        return not self == obj
+
+    def __len__(self):
+        return len(text_type(self))
+
 
 class Email(object):
     """Base class for email messages.

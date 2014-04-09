@@ -39,6 +39,20 @@ class TestAddress:
         addr = Address(('Alice', 'alice@example.com'))
         assert addr.format() == u'Alice <alice@example.com>'
 
+    def test_compare_addresses(self, alice):
+        assert alice == Address('alice@example.com')
+
+    def test_compare_address_and_unicode(self, alice):
+        assert alice == u'alice@example.com'
+
+    def test_compare_address_and_list(self):
+        addr = ('Alice', 'alice@example.com')
+        assert Address(addr) == addr
+
+    def test_compare_address_and_tuple(self):
+        addr = ['Alice', 'alice@example.com']
+        assert Address(addr) == addr
+
 
 def test_mail_init(mail):
     assert mail.subject == 'Down the Rabbit-Hole'
