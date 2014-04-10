@@ -44,6 +44,12 @@ class Proxy(object):
 class Address(object):
     """A wrapper for email address.
 
+    If address consists of two-element list, they handled as the name, email
+    address pair::
+
+    >>> Address(('Alice', 'alice@example.com')).format()
+    'Alice <alice@example.com>'
+
     :param address: The email address
     """
 
