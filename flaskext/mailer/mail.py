@@ -16,6 +16,31 @@ def utf8(s):
     return s.encode('utf-8') if isinstance(s, text_type) else s
 
 
+class Proxy(object):
+    """Create a proxy descriptor.
+
+    Descriptor uses to transparently converts value to given type.
+
+    :param type: The type to converts to
+    :param attribute_name: The name of the attribute to store the converted value
+    """
+
+    def __init__(self, type, attribute_name):
+        self.type = type
+        self.attribute_name = attribute_name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.attribute_name, None)
+
+    def __set__(self, instance, value):
+        if not isinstance(value, self.type):
+            value = self.type(value)
+        setattr(instance, self.attribute_name, value)
+
+    def __delete__(self, instance):
+        setattr(instance, self.attribute_name, None)
+
+
 class Address(object):
     """A wrapper for email address.
 
