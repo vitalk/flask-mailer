@@ -93,6 +93,10 @@ class Email(object):
     'hello, there'
 
     """
+
+    from_addr = Proxy(Address, '_from_addr')
+    reply_to = Proxy(Address, '_reply_to')
+
     def __init__(self,
                  subject,
                  text='',
@@ -118,17 +122,6 @@ class Email(object):
         """
         return set(self.to_addrs) | set(self.cc or ()) | set(self.bcc or ())
 
-    @property
-    def from_addr(self):
-        return self._from_addr
-
-    @from_addr.setter
-    def from_addr(self, from_addr):
-        # unpack (name, address) tuple
-        if isinstance(from_addr, tuple):
-            from_addr = '%s <%s>' % from_addr
-        self._from_addr = from_addr
-
     def add_addr(self, addr):
         """Add email address to the list of recipients."""
         lines = addr.splitlines()
@@ -149,7 +142,7 @@ class Email(object):
         del msg['Content-Type']
         del msg['Content-Transfer-Encoding']
 
-        msg['From'] = utf8(self.from_addr)
+        msg['From'] = text_type(self.from_addr)
         msg['To'] = ', '.join(map(utf8, self.send_to))
         msg['Subject'] = utf8(self.subject)
         msg['Content-Type'] = 'text/plain; charset=utf-8'
@@ -162,7 +155,7 @@ class Email(object):
             msg['Bcc'] = ', '.join(map(utf8, self.bcc))
 
         if self.reply_to:
-            msg['Reply-To'] = utf8(self.reply_to)
+            msg['Reply-To'] = text_type(self.reply_to)
 
         return msg
 
