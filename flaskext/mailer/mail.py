@@ -84,6 +84,57 @@ class Address(object):
         return len(text_type(self))
 
 
+class Addresses(list):
+    """A base class for email address list.
+
+    Transparently converts appended values to :class:`Address` instances.
+    Formated list is suitable to use in mail header::
+
+    >>> cc = Addresses(('Alice', 'alice@example.com'))
+    >>> cc.append(('Bob', 'bob@example.com'))
+    >>> cc.format()
+    u'Alice <alice@example.com>, Bob <bob@example.com>'
+
+    """
+
+    def __init__(self, values=None):
+        super(Addresses, self).__init__()
+
+        if values is None:
+            return
+        elif isinstance(values, tuple):
+            self.append(values)
+            return
+        elif isinstance(values, string_types):
+            values = values,
+        elif isinstance(values, Address):
+            values = values,
+
+        self.extend(values)
+
+    def format(self):
+        """Returns string suitable to use in mail header."""
+        return ', '.join(map(text_type, self))
+
+    def __str__(self):
+        return self.format()
+
+    def __unicode__(self):
+        return utf8(str(self))
+
+    def append(self, value):
+        return self.extend([value,])
+
+    def extend(self, iterable):
+        """Extend list by appending elements from the iterable.
+
+        Convert each value to :class:`Address` instance before extend.
+        """
+        values = [Address(x) if not isinstance(x, Address) else x
+                  for x in iterable]
+        super(Addresses, self).extend(values)
+
+
 class Email(object):
     """Base class for email messages.
 

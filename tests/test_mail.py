@@ -3,7 +3,9 @@
 import pytest
 
 from flask.ext.mailer import Email
+from flask.ext.mailer.mail import Proxy
 from flask.ext.mailer.mail import Address
+from flask.ext.mailer.mail import Addresses
 
 
 @pytest.fixture
@@ -52,6 +54,52 @@ class TestAddress:
     def test_compare_address_and_tuple(self):
         addr = ['Alice', 'alice@example.com']
         assert Address(addr) == addr
+
+
+class TestAddresses(object):
+
+    addresses = Proxy(Addresses, '_addresses')
+
+    def setup(self):
+        self.addresses = Addresses()
+
+    def test_init(self):
+        assert self.addresses == []
+
+    def test_assign_single_address(self):
+        address = 'alice@example.com'
+        self.addresses = address
+        assert self.addresses == [address,]
+        assert self.addresses.format() == address
+
+    def test_assign_list_of_addresses(self):
+        addresses = ['alice@example.com', 'bob@example.com']
+        self.addresses = addresses
+        assert self.addresses == addresses
+        assert self.addresses.format() == ', '.join(addresses)
+
+    def test_assign_list_of_named_addresses(self):
+        named_address = ('Alice', 'alice@example.com')
+        self.addresses = [named_address,]
+        assert self.addresses == [named_address,]
+        assert self.addresses.format() == 'Alice <alice@example.com>'
+
+    def test_assign_address_instance(self, alice):
+        self.addresses = alice
+        assert self.addresses == [alice,]
+        assert self.addresses.format() == alice.format()
+
+    def test_append_value_to_list(self):
+        self.addresses.append('alice@example.com')
+        assert self.addresses.format() == 'alice@example.com'
+
+    def test_append_address_instance_to_list(self, alice):
+        self.addresses.append(alice)
+        assert self.addresses.format() == 'alice@example.com'
+
+    def test_append_named_address_to_list(self):
+        self.addresses.append(['Alice', 'alice@example.com'])
+        assert self.addresses.format() == 'Alice <alice@example.com>'
 
 
 class TestMail:
