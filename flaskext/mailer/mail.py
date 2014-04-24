@@ -198,7 +198,7 @@ class Email(object):
         del msg['Content-Transfer-Encoding']
 
         msg['From'] = text_type(self.from_addr)
-        msg['To'] = self.send_to.format()
+        msg['To'] = self.to.format()
         msg['Subject'] = utf8(self.subject)
         msg['Content-Type'] = 'text/plain; charset=utf-8'
         msg['Content-Transfer-Encoding'] = '8bit'

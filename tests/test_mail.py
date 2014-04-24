@@ -168,7 +168,7 @@ class TestMail:
     def test_mail_to_mimetext(self, mail):
         message = mail.to_message()
         assert message['From'] == 'Alice from Wonderland <alice@wonderland.com>'
-        assert message['To'] == 'bcc@example.com, cc@example.com, one@example.com, two@example.com'
+        assert message['To'] == 'one@example.com, two@example.com'
         assert message['Subject'] == 'Down the Rabbit-Hole'
         assert message['Cc'] == 'cc@example.com'
         assert message['Bcc'] == 'bcc@example.com'
@@ -180,7 +180,7 @@ class TestMail:
         assert mail.format(sep='\n') == '''\
 MIME-Version: 1.0
 From: Alice from Wonderland <alice@wonderland.com>
-To: bcc@example.com, cc@example.com, one@example.com, two@example.com
+To: one@example.com, two@example.com
 Subject: Down the Rabbit-Hole
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
