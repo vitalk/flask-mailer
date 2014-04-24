@@ -153,6 +153,9 @@ class Email(object):
 
     from_addr = Proxy(Address, '_from_addr')
     reply_to = Proxy(Address, '_reply_to')
+    to_addrs = Proxy(Addresses, '_to_addrs')
+    bcc = Proxy(Addresses, '_bcc')
+    cc = Proxy(Addresses, '_cc')
 
     def __init__(self,
                  subject,
@@ -165,26 +168,21 @@ class Email(object):
         self.text = text
         self.subject = u' '.join(subject.splitlines())
         self.from_addr = from_addr
-        self.cc = to_list(cc)
-        self.bcc = to_list(bcc)
+        self.cc = cc
+        self.bcc = bcc
         self.reply_to = reply_to
-        self.to_addrs = []
-        to_addrs = to_list(to_addrs or [])
-        map(self.add_addr, to_addrs)
+        self.to_addrs = to_addrs or []
 
     @property
     def send_to(self):
-        """Returns list of recipients created from cc, bcc and to_addrs
-        lists.
+        """Returns list of unique recipients of the email. List includes direct
+        addressees as well as Cc and Bcc entries.
         """
-        return set(self.to_addrs) | set(self.cc or ()) | set(self.bcc or ())
-
-    def add_addr(self, addr):
-        """Add email address to the list of recipients."""
-        lines = addr.splitlines()
-        if len(lines) != 1:
-            raise ValueError('invalid email address value')
-        self.to_addrs.append(lines[0])
+        to = map(text_type, self.to_addrs)
+        cc = map(text_type, self.cc or ())
+        bcc = map(text_type, self.bcc or ())
+        uniq = set(to) | set(cc) | set(bcc)
+        return Addresses(uniq)
 
     def to_message(self):
         """Returns the email as MIMEText object."""
@@ -200,16 +198,16 @@ class Email(object):
         del msg['Content-Transfer-Encoding']
 
         msg['From'] = text_type(self.from_addr)
-        msg['To'] = ', '.join(map(utf8, self.send_to))
+        msg['To'] = self.send_to.format()
         msg['Subject'] = utf8(self.subject)
         msg['Content-Type'] = 'text/plain; charset=utf-8'
         msg['Content-Transfer-Encoding'] = '8bit'
 
         if self.cc:
-            msg['Cc'] = ', '.join(map(utf8, self.cc))
+            msg['Cc'] = self.cc.format()
 
         if self.bcc:
-            msg['Bcc'] = ', '.join(map(utf8, self.bcc))
+            msg['Bcc'] = self.bcc.format()
 
         if self.reply_to:
             msg['Reply-To'] = text_type(self.reply_to)

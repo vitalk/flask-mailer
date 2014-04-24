@@ -129,30 +129,36 @@ class TestMail:
         mail.reply_to = ('Alice', 'noreply@example.com')
         assert mail.reply_to == 'Alice <noreply@example.com>'
 
-    def test_send_to_includes_cc_and_bcc_addresses_too(self, mail):
-        assert mail.send_to == set(['bcc@example.com', 'cc@example.com', 'one@example.com', 'two@example.com'])
-        mail.add_addr('somebody@example.com')
-        assert mail.send_to == set(['bcc@example.com', 'cc@example.com', 'one@example.com', 'two@example.com', 'somebody@example.com'])
+    def test_cc(self, mail):
+        assert mail.cc == ['cc@example.com']
 
-    def test_no_duplicate_entries_in_recipients_list(self, mail):
-        assert len(mail.send_to) == 4
+    def test_cc_as_list(self, mail):
+        mail.cc = ['cc@example.com', 'cc2@example.com']
+        assert mail.cc == ['cc@example.com', 'cc2@example.com']
+
+    def test_include_cc_in_recipients(self, mail):
         assert 'cc@example.com' in mail.send_to
-        mail.add_addr('cc@example.com')
+
+    def test_bcc(self, mail):
+        assert mail.bcc == ['bcc@example.com']
+
+    def test_bcc_as_list(self, mail):
+        mail.bcc = ['bcc@example.com', 'bcc2@example.com']
+        assert mail.bcc == ['bcc@example.com', 'bcc2@example.com']
+
+    def test_include_bcc_in_recipients(self, mail):
+        assert 'bcc@example.com' in mail.send_to
+
+    def test_recipient_list_contains_only_unique_entries(self, mail):
+        mail.cc = 'cc@example.com'
         assert len(mail.send_to) == 4
-
-    def test_to_addr_cc_bcc_as_string(self):
-        mail = Email('hello', to_addrs='to@example.com',
-                     cc='cc@example.com', bcc='bcc@example.com')
-        assert mail.send_to == set(['to@example.com', 'cc@example.com', 'bcc@example.com'])
-
-    def test_to_addr_cc_bcc_as_list(self):
-        mail = Email('hello', to_addrs=['to@example.com'],
-                     cc=['cc@example.com'], bcc=['bcc@example.com'])
-        assert mail.send_to == set(['to@example.com', 'cc@example.com', 'bcc@example.com'])
+        mail.cc.append('cc@example.com')
+        assert len(mail.send_to) == 4
 
     def test_add_destination_address_to_mail(self, mail):
-        mail.add_addr('hatter@wonderland.com')
+        mail.to_addrs.append('hatter@wonderland.com')
         assert 'hatter@wonderland.com' in mail.to_addrs
+        assert mail.send_to == ['bcc@example.com', 'hatter@wonderland.com', 'cc@example.com', 'one@example.com', 'two@example.com']
 
     def test_raises_error_if_mailing_parameters_is_blank(self):
         mail = Email('Dummy mail')
