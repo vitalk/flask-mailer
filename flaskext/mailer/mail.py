@@ -153,14 +153,14 @@ class Email(object):
 
     from_addr = Proxy(Address, '_from_addr')
     reply_to = Proxy(Address, '_reply_to')
-    to_addrs = Proxy(Addresses, '_to_addrs')
     bcc = Proxy(Addresses, '_bcc')
+    to = Proxy(Addresses, '_to')
     cc = Proxy(Addresses, '_cc')
 
     def __init__(self,
                  subject,
                  text='',
-                 to_addrs=None,
+                 to=None,
                  from_addr=None,
                  cc=None,
                  bcc=None,
@@ -168,17 +168,17 @@ class Email(object):
         self.text = text
         self.subject = u' '.join(subject.splitlines())
         self.from_addr = from_addr
+        self.to = to or []
         self.cc = cc
         self.bcc = bcc
         self.reply_to = reply_to
-        self.to_addrs = to_addrs or []
 
     @property
     def send_to(self):
         """Returns list of unique recipients of the email. List includes direct
         addressees as well as Cc and Bcc entries.
         """
-        to = map(text_type, self.to_addrs)
+        to = map(text_type, self.to)
         cc = map(text_type, self.cc or ())
         bcc = map(text_type, self.bcc or ())
         uniq = set(to) | set(cc) | set(bcc)
@@ -187,7 +187,7 @@ class Email(object):
     def to_message(self):
         """Returns the email as MIMEText object."""
         if not self.text or not self.subject or \
-           not self.to_addrs or not self.from_addr:
+           not self.to or not self.from_addr:
             raise RuntimeError('Fill in mailing parameters first')
 
         msg = MIMEText(utf8(self.text))

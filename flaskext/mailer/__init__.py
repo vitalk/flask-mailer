@@ -11,10 +11,10 @@ from flask.ext.mailer.util import import_path
 __all__ = ('get_mailer', 'send_email', 'Mailer', 'Email')
 
 
-def send_email(subject, text, to_addrs, fail_quiet=True):
+def send_email(subject, text, to, fail_quiet=True):
     """Send an email."""
     mailer = get_mailer(None)
-    mail = Email(subject, text, to_addrs)
+    mail = Email(subject, text, to)
     if fail_quiet:
         return mailer.send_quiet(mail)
     return mailer.send(mail)

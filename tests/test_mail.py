@@ -12,7 +12,7 @@ from flask.ext.mailer.mail import Addresses
 def mail():
     return Email('Down the Rabbit-Hole',
                  from_addr=('Alice from Wonderland', 'alice@wonderland.com'),
-                 to_addrs=['one@example.com', 'two@example.com'],
+                 to=['one@example.com', 'two@example.com'],
                  text='What is the use of a book '
                       'without pictures or conversation?',
                  cc='cc@example.com',
@@ -108,7 +108,7 @@ class TestMail:
         assert mail.subject == 'Down the Rabbit-Hole'
         assert mail.text == 'What is the use of a book without pictures or conversation?'
         assert mail.from_addr == 'Alice from Wonderland <alice@wonderland.com>'
-        assert mail.to_addrs == ['one@example.com', 'two@example.com']
+        assert mail.to == ['one@example.com', 'two@example.com']
         assert mail.cc == ['cc@example.com']
         assert mail.bcc == ['bcc@example.com']
         assert mail.reply_to == 'noreply@wonderland.com'
@@ -156,8 +156,7 @@ class TestMail:
         assert len(mail.send_to) == 4
 
     def test_add_destination_address_to_mail(self, mail):
-        mail.to_addrs.append('hatter@wonderland.com')
-        assert 'hatter@wonderland.com' in mail.to_addrs
+        mail.to.append('hatter@wonderland.com')
         assert mail.send_to == ['bcc@example.com', 'hatter@wonderland.com', 'cc@example.com', 'one@example.com', 'two@example.com']
 
     def test_raises_error_if_mailing_parameters_is_blank(self):
