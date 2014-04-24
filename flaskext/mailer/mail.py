@@ -206,9 +206,6 @@ class Email(object):
         if self.cc:
             msg['Cc'] = self.cc.format()
 
-        if self.bcc:
-            msg['Bcc'] = self.bcc.format()
-
         if self.reply_to:
             msg['Reply-To'] = text_type(self.reply_to)
 

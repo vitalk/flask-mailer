@@ -149,6 +149,9 @@ class TestMail:
     def test_include_bcc_in_recipients(self, mail):
         assert 'bcc@example.com' in mail.send_to
 
+    def test_dont_include_bcc_in_mail_message(self, mail):
+        assert 'bcc@example.com' not in mail.format()
+
     def test_recipient_list_contains_only_unique_entries(self, mail):
         mail.cc = 'cc@example.com'
         assert len(mail.send_to) == 4
@@ -171,7 +174,6 @@ class TestMail:
         assert message['To'] == 'one@example.com, two@example.com'
         assert message['Subject'] == 'Down the Rabbit-Hole'
         assert message['Cc'] == 'cc@example.com'
-        assert message['Bcc'] == 'bcc@example.com'
         assert message['Reply-To'] == 'noreply@wonderland.com'
         assert message['Content-Type'] == 'text/plain; charset=utf-8'
         assert message['Content-Transfer-Encoding'] == '8bit'
@@ -185,7 +187,6 @@ Subject: Down the Rabbit-Hole
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Cc: cc@example.com
-Bcc: bcc@example.com
 Reply-To: noreply@wonderland.com
 
 What is the use of a book without pictures or conversation?'''
