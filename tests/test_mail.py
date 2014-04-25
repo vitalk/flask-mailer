@@ -59,6 +59,10 @@ class TestAddress:
         addr = Address((u'Álice', u'alice@example.com'))
         assert addr.format() == '=?utf-8?b?w4FsaWNl?= <alice@example.com>'
 
+    def test_strip_newlines_from_address(self):
+        addr = Address(('Alice\n', 'alice\r\n@example.com\r'))
+        assert addr.format() == 'Alice <alice@example.com>'
+
 
 class TestAddresses(object):
 

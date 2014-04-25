@@ -60,7 +60,7 @@ def sanitize_address(addr, encoding='utf-8'):
         else:
             addr = rfc_compliant(addr, encoding)
 
-    return formataddr((nm, addr))
+    return ''.join(formataddr((nm, addr)).splitlines())
 
 
 class Proxy(object):
