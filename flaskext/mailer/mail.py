@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from email.mime.text import MIMEText
+from email.header import Header
+from email.utils import parseaddr
+from email.utils import formataddr
 
 from flaskext.mailer.compat import string_types, text_type
 
@@ -14,6 +17,50 @@ def to_list(el):
 
 def utf8(s):
     return s.encode('utf-8') if isinstance(s, text_type) else s
+
+
+def contains_nonascii_characters(raw):
+    return not all(ord(c) < 128 for c in raw)
+
+
+def sanitize_address(addr, encoding='utf-8'):
+    """Sanitize email address into RFC 2822-compliant string.
+
+    Adopted version from Django mail package
+    (https://github.com/django/django/blob/master/django/core/mail/message.py).
+
+    :param addr: The address to process.
+    :param encoding: The character set that the address was encoded in.
+    """
+    if isinstance(addr, string_types):
+        addr = parseaddr(addr)
+    nm, addr = addr
+
+    def rfc_compliant(s, encoding):
+        """Encode a header string into RFC-compliant format. Do not modify
+        string if is contains only ascii letters.
+        """
+        if contains_nonascii_characters(s):
+            return Header(s, encoding).encode()
+        return s
+
+    try:
+        nm = rfc_compliant(nm, encoding)
+    except UnicodeEncodeError:
+        nm = rfc_compliant(nm, 'utf-8')
+
+    try:
+        addr.encode('ascii')
+    except UnicodeEncodeError:
+        if '@' in addr:
+            localpart, domain = addr.split('@', 1)
+            localpart = str(Header(localpart, encoding))
+            domain = domain.encode('idna').decode('ascii')
+            addr = '@'.join([localpart, domain])
+        else:
+            addr = rfc_compliant(addr, encoding)
+
+    return formataddr((nm, addr))
 
 
 class Proxy(object):
@@ -44,6 +91,12 @@ class Proxy(object):
 class Address(object):
     """A wrapper for email address.
 
+    Perform sanitizing and formating email address. Formated address
+    RFC 2822-compliant and suitable to use in internationalized email headers::
+
+    >>> Address(u'álice@example.com').format()
+    '=?utf-8?b?w6FsaWNl?=@example.com'
+
     If address consists of two-element list, they handled as the name, email
     address pair::
 
@@ -57,9 +110,7 @@ class Address(object):
         self.address = address
 
     def format(self):
-        if isinstance(self.address, (list, tuple)):
-            return u'{} <{}>'.format(*self.address)
-        return self.address
+        return sanitize_address(self.address)
 
     def __str__(self):
         return self.format()

@@ -55,6 +55,10 @@ class TestAddress:
         addr = ['Alice', 'alice@example.com']
         assert Address(addr) == addr
 
+    def test_encode_nonascii_strings(self):
+        addr = Address((u'Álice', u'alice@example.com'))
+        assert addr.format() == '=?utf-8?b?w4FsaWNl?= <alice@example.com>'
+
 
 class TestAddresses(object):
 
@@ -177,6 +181,16 @@ class TestMail:
         assert message['Reply-To'] == 'noreply@wonderland.com'
         assert message['Content-Type'] == 'text/plain; charset=utf-8'
         assert message['Content-Transfer-Encoding'] == '8bit'
+
+    def test_mail_contains_nonascii_characters(self, mail):
+        mail.from_addr = (u'Álice', u'álice@example.com')
+        assert 'From: =?utf-8?b?w4FsaWNl?= <=?utf-8?b?w6FsaWNl?=@example.com>' in mail.format()
+        mail.cc = (u'ćć', 'cc@example.com')
+        assert 'Cc: =?utf-8?b?xIfEhw==?= <cc@example.com>' in mail.format()
+        mail.reply_to = (u'nóréply', 'noreply@example.com')
+        assert 'Reply-To: =?utf-8?b?bsOzcsOpcGx5?= <noreply@example.com>' in mail.format()
+        mail.to = ['á <a@example.com>', u'ä <aa@example.com>']
+        assert 'To: =?utf-8?b?w6E=?= <a@example.com>, =?utf-8?b?w6Q=?= <aa@example.com>' in mail.format()
 
     def test_mail_to_string(self, mail):
         assert mail.format(sep='\n') == '''\
