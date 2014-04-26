@@ -55,6 +55,12 @@ class TestAddress:
         addr = ['Alice', 'alice@example.com']
         assert Address(addr) == addr
 
+    def test_address_is_truly_when_value_is_truly(self):
+        addr = Address('alice@example.com')
+        assert addr
+        addr = Address(None)
+        assert not addr
+
     def test_encode_nonascii_strings(self):
         addr = Address((u'Álice', u'alice@example.com'))
         assert addr.format() == '=?utf-8?b?w4FsaWNl?= <alice@example.com>'
@@ -136,6 +142,11 @@ class TestMail:
     def test_unpack_reply_to(self, mail):
         mail.reply_to = ('Alice', 'noreply@example.com')
         assert mail.reply_to == 'Alice <noreply@example.com>'
+
+    def test_dont_include_reply_to_in_mail_message_if_not_set(self, mail):
+        mail.reply_to = None
+        assert not mail.reply_to
+        assert 'Reply-To:' not in mail.format()
 
     def test_cc(self, mail):
         assert mail.cc == ['cc@example.com']

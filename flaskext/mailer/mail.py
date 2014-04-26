@@ -118,6 +118,9 @@ class Address(object):
     def __unicode__(self):
         return utf8(str(self))
 
+    def __nonzero__(self):
+        return bool(self.address)
+
     def __eq__(self, obj):
         if isinstance(obj, Address):
             return text_type(self) == text_type(obj)
