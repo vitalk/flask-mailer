@@ -9,6 +9,12 @@ from flask.ext.mailer.mail import Addresses
 
 
 @pytest.fixture
+def dummy():
+    return Email('Subject', from_addr='from@example.com',
+                 to='to@example.com', text='Plain text')
+
+
+@pytest.fixture
 def mail():
     return Email('Down the Rabbit-Hole',
                  from_addr=('Alice from Wonderland', 'alice@wonderland.com'),
@@ -158,6 +164,12 @@ class TestMail:
     def test_include_cc_in_recipients(self, mail):
         assert 'cc@example.com' in mail.send_to
 
+    def test_empty_cc(self, dummy):
+        assert dummy.cc == []
+
+    def test_dont_include_cc_to_mail_message_if_not_set(self, dummy):
+        assert 'Cc:' not in dummy.format()
+
     def test_bcc(self, mail):
         assert mail.bcc == ['bcc@example.com']
 
@@ -170,6 +182,9 @@ class TestMail:
 
     def test_dont_include_bcc_in_mail_message(self, mail):
         assert 'bcc@example.com' not in mail.format()
+
+    def test_empty_bcc(self, dummy):
+        assert dummy.bcc == []
 
     def test_recipient_list_contains_only_unique_entries(self, mail):
         mail.cc = 'cc@example.com'

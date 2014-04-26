@@ -222,7 +222,7 @@ class Email(object):
         self.text = text
         self.subject = u' '.join(subject.splitlines())
         self.from_addr = from_addr
-        self.to = to or []
+        self.to = to
         self.cc = cc
         self.bcc = bcc
         self.reply_to = reply_to
@@ -233,8 +233,8 @@ class Email(object):
         addressees as well as Cc and Bcc entries.
         """
         to = map(text_type, self.to)
-        cc = map(text_type, self.cc or ())
-        bcc = map(text_type, self.bcc or ())
+        cc = map(text_type, self.cc)
+        bcc = map(text_type, self.bcc)
         uniq = set(to) | set(cc) | set(bcc)
         return Addresses(uniq)
 
