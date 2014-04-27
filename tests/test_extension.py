@@ -74,10 +74,10 @@ def test_extension_send_mail(dummy, mail):
 
 def test_send_email_shortcut(app, dummy, mail):
     with app.test_request_context():
-        send_email(mail.subject, mail.text, mail.to_addrs)
+        send_email(mail.subject, mail.text, mail.to)
 
     assert len(dummy.outbox) == 1
     sent = dummy.outbox[0]
     assert sent.subject == mail.subject
     assert sent.text == mail.text
-    assert sent.to_addrs == mail.to_addrs
+    assert sent.to == mail.to

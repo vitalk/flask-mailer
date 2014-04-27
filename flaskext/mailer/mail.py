@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from email.mime.text import MIMEText
+from email.header import Header
+from email.utils import parseaddr
+from email.utils import formataddr
 
 from flaskext.mailer.compat import string_types, text_type
 
@@ -14,6 +17,176 @@ def to_list(el):
 
 def utf8(s):
     return s.encode('utf-8') if isinstance(s, text_type) else s
+
+
+def contains_nonascii_characters(raw):
+    return not all(ord(c) < 128 for c in raw)
+
+
+def sanitize_address(addr, encoding='utf-8'):
+    """Sanitize email address into RFC 2822-compliant string.
+
+    Adopted version from Django mail package
+    (https://github.com/django/django/blob/master/django/core/mail/message.py).
+
+    :param addr: The address to process.
+    :param encoding: The character set that the address was encoded in.
+    """
+    if isinstance(addr, string_types):
+        addr = parseaddr(addr)
+    nm, addr = addr
+
+    def rfc_compliant(s, encoding):
+        """Encode a header string into RFC-compliant format. Do not modify
+        string if is contains only ascii letters.
+        """
+        if contains_nonascii_characters(s):
+            return Header(s, encoding).encode()
+        return s
+
+    try:
+        nm = rfc_compliant(nm, encoding)
+    except UnicodeEncodeError:
+        nm = rfc_compliant(nm, 'utf-8')
+
+    try:
+        addr.encode('ascii')
+    except UnicodeEncodeError:
+        if '@' in addr:
+            localpart, domain = addr.split('@', 1)
+            localpart = str(Header(localpart, encoding))
+            domain = domain.encode('idna').decode('ascii')
+            addr = '@'.join([localpart, domain])
+        else:
+            addr = rfc_compliant(addr, encoding)
+
+    return ''.join(formataddr((nm, addr)).splitlines())
+
+
+class Proxy(object):
+    """Create a proxy descriptor.
+
+    Descriptor uses to transparently converts value to given type.
+
+    :param type: The type to converts to
+    :param attribute_name: The name of the attribute to store the converted value
+    """
+
+    def __init__(self, type, attribute_name):
+        self.type = type
+        self.attribute_name = attribute_name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.attribute_name, None)
+
+    def __set__(self, instance, value):
+        if not isinstance(value, self.type):
+            value = self.type(value)
+        setattr(instance, self.attribute_name, value)
+
+    def __delete__(self, instance):
+        setattr(instance, self.attribute_name, None)
+
+
+class Address(object):
+    """A wrapper for email address.
+
+    Perform sanitizing and formating email address. Formated address
+    RFC 2822-compliant and suitable to use in internationalized email headers::
+
+    >>> Address(u'álice@example.com').format()
+    '=?utf-8?b?w6FsaWNl?=@example.com'
+
+    If address consists of two-element list, they handled as the name, email
+    address pair::
+
+    >>> Address(('Alice', 'alice@example.com')).format()
+    'Alice <alice@example.com>'
+
+    :param address: The email address
+    """
+
+    def __init__(self, address):
+        self.address = address
+
+    def format(self):
+        return sanitize_address(self.address)
+
+    def __str__(self):
+        return self.format()
+
+    def __unicode__(self):
+        return utf8(str(self))
+
+    def __nonzero__(self):
+        return bool(self.address)
+
+    def __eq__(self, obj):
+        if isinstance(obj, Address):
+            return text_type(self) == text_type(obj)
+        elif isinstance(obj, string_types):
+            return text_type(self) == obj
+        elif isinstance(obj, (list, tuple)):
+            return text_type(self) == Address(obj)
+        raise NotImplementedError('Unable to compare Address instance '
+                                  'against {} instance'.format(type(obj)))
+
+    def __ne__(self, obj):
+        return not self == obj
+
+    def __len__(self):
+        return len(text_type(self))
+
+
+class Addresses(list):
+    """A base class for email address list.
+
+    Transparently converts appended values to :class:`Address` instances.
+    Formated list is suitable to use in mail header::
+
+    >>> cc = Addresses(('Alice', 'alice@example.com'))
+    >>> cc.append(('Bob', 'bob@example.com'))
+    >>> cc.format()
+    u'Alice <alice@example.com>, Bob <bob@example.com>'
+
+    """
+
+    def __init__(self, values=None):
+        super(Addresses, self).__init__()
+
+        if values is None:
+            return
+        elif isinstance(values, tuple):
+            self.append(values)
+            return
+        elif isinstance(values, string_types):
+            values = values,
+        elif isinstance(values, Address):
+            values = values,
+
+        self.extend(values)
+
+    def format(self):
+        """Returns string suitable to use in mail header."""
+        return ', '.join(map(text_type, self))
+
+    def __str__(self):
+        return self.format()
+
+    def __unicode__(self):
+        return utf8(str(self))
+
+    def append(self, value):
+        return self.extend([value,])
+
+    def extend(self, iterable):
+        """Extend list by appending elements from the iterable.
+
+        Convert each value to :class:`Address` instance before extend.
+        """
+        values = [Address(x) if not isinstance(x, Address) else x
+                  for x in iterable]
+        super(Addresses, self).extend(values)
 
 
 class Email(object):
@@ -31,10 +204,17 @@ class Email(object):
     'hello, there'
 
     """
+
+    from_addr = Proxy(Address, '_from_addr')
+    reply_to = Proxy(Address, '_reply_to')
+    bcc = Proxy(Addresses, '_bcc')
+    to = Proxy(Addresses, '_to')
+    cc = Proxy(Addresses, '_cc')
+
     def __init__(self,
                  subject,
                  text='',
-                 to_addrs=None,
+                 to=None,
                  from_addr=None,
                  cc=None,
                  bcc=None,
@@ -42,42 +222,26 @@ class Email(object):
         self.text = text
         self.subject = u' '.join(subject.splitlines())
         self.from_addr = from_addr
-        self.cc = to_list(cc)
-        self.bcc = to_list(bcc)
+        self.to = to
+        self.cc = cc
+        self.bcc = bcc
         self.reply_to = reply_to
-        self.to_addrs = []
-        to_addrs = to_list(to_addrs or [])
-        map(self.add_addr, to_addrs)
 
     @property
     def send_to(self):
-        """Returns list of recipients created from cc, bcc and to_addrs
-        lists.
+        """Returns list of unique recipients of the email. List includes direct
+        addressees as well as Cc and Bcc entries.
         """
-        return set(self.to_addrs) | set(self.cc or ()) | set(self.bcc or ())
-
-    @property
-    def from_addr(self):
-        return self._from_addr
-
-    @from_addr.setter
-    def from_addr(self, from_addr):
-        # unpack (name, address) tuple
-        if isinstance(from_addr, tuple):
-            from_addr = '%s <%s>' % from_addr
-        self._from_addr = from_addr
-
-    def add_addr(self, addr):
-        """Add email address to the list of recipients."""
-        lines = addr.splitlines()
-        if len(lines) != 1:
-            raise ValueError('invalid email address value')
-        self.to_addrs.append(lines[0])
+        to = map(text_type, self.to)
+        cc = map(text_type, self.cc)
+        bcc = map(text_type, self.bcc)
+        uniq = set(to) | set(cc) | set(bcc)
+        return Addresses(uniq)
 
     def to_message(self):
         """Returns the email as MIMEText object."""
         if not self.text or not self.subject or \
-           not self.to_addrs or not self.from_addr:
+           not self.to or not self.from_addr:
             raise RuntimeError('Fill in mailing parameters first')
 
         msg = MIMEText(utf8(self.text))
@@ -87,20 +251,17 @@ class Email(object):
         del msg['Content-Type']
         del msg['Content-Transfer-Encoding']
 
-        msg['From'] = utf8(self.from_addr)
-        msg['To'] = ', '.join(map(utf8, self.send_to))
+        msg['From'] = text_type(self.from_addr)
+        msg['To'] = self.to.format()
         msg['Subject'] = utf8(self.subject)
         msg['Content-Type'] = 'text/plain; charset=utf-8'
         msg['Content-Transfer-Encoding'] = '8bit'
 
         if self.cc:
-            msg['Cc'] = ', '.join(map(utf8, self.cc))
-
-        if self.bcc:
-            msg['Bcc'] = ', '.join(map(utf8, self.bcc))
+            msg['Cc'] = self.cc.format()
 
         if self.reply_to:
-            msg['Reply-To'] = utf8(self.reply_to)
+            msg['Reply-To'] = text_type(self.reply_to)
 
         return msg
 

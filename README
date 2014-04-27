@@ -45,13 +45,13 @@ explicitly.
 
 from flaskext.mailer.mail import Email
 mail = Email('hi, there', 'awesome message',
-             to_addrs=['to@example.com', 'you@example.com'],
+             to=['to@example.com', 'you@example.com'],
              from_addr='me@example.com')
 
 If 'from_addr' is two-element tuple, this will be split into name and address:
 
 mail = Email('hi, there', 'awesome message',
-             to_addrs=['to@example.com', 'you@example.com'],
+             to=['to@example.com', 'you@example.com'],
              from_addr=('me', 'me@example.com'))
 assert mail.from_addr == 'me <me@example.com>'
 
