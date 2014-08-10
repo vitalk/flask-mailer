@@ -18,16 +18,15 @@ def test_extension_register_themself_in_app(dummy, app):
     assert app.extensions['mailer'] is not None
 
 
+@pytest.mark.config(backend='no.such.backend')
 def test_force_use_dummy_mailer_in_test_enviroment(app):
-    app.config[key('testing')] = True
-    app.config[key('backend')] = 'no.such.backend'
     Mailer(app)
     assert app.config[key('backend')] == 'flask.ext.mailer.backends.dummy.DummyMailer'
 
 
+@pytest.mark.config(testing=False)
+@pytest.mark.config(backend='no.such.backend')
 def test_extension_raises_error_on_invalid_backend_and_not_in_test_enviroment(app):
-    app.config[key('testing')] = False
-    app.config[key('backend')] = 'no.such.backend'
     with pytest.raises(RuntimeError) as exc:
         Mailer(app)
         assert 'Invalid backend' in exc.exconly()
