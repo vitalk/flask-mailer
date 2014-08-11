@@ -1,10 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-flask-mailer
-------------------------------------------------------------------
+    flask-mailer
+    ~~~~~~~~~~~~
 
-A Flask extension for sending emails.
+    A Flask extension for sending emails.
+
+    :copyright: (c) by Vital Kudzelka
+    :license: BSD
 """
 import sys
 import subprocess
