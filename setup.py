@@ -4,7 +4,7 @@
     Flask-Mailer
     ~~~~~~~~~~~~
 
-    A Flask extension for sending emails.
+    A Flask extension for sending emails with pluggable backends.
 
     :copyright: (c) by Vital Kudzelka
     :license: BSD
@@ -39,7 +39,7 @@ setup(
     license='BSD',
     author='Vital Kudzelka',
     author_email='vital.kudzelka@gmail.com',
-    description='A Flask extension for sending emails',
+    description='A Flask extension for sending emails with pluggable backends.',
     long_description=__doc__,
     packages=[
         'flaskext',
