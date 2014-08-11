@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-    flask-mailer
+    Flask-Mailer
     ~~~~~~~~~~~~
 
     A Flask extension for sending emails.
@@ -34,7 +34,7 @@ class pytest(Command):
 
 
 setup(
-    name='flask-mailer',
+    name='Flask-Mailer',
     version='0.2.1',
     license='BSD',
     author='Vital Kudzelka',
