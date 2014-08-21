@@ -23,6 +23,15 @@ def contains_nonascii_characters(raw):
     return not all(ord(c) < 128 for c in raw)
 
 
+def rfc_compliant(s, encoding):
+    """Encode a header string into RFC-compliant format. Do not modify
+    string if is contains only ascii letters.
+    """
+    if contains_nonascii_characters(s):
+        return Header(s, encoding).encode()
+    return s
+
+
 def sanitize_address(addr, encoding='utf-8'):
     """Sanitize email address into RFC 2822-compliant string.
 
@@ -35,14 +44,6 @@ def sanitize_address(addr, encoding='utf-8'):
     if isinstance(addr, string_types):
         addr = parseaddr(addr)
     nm, addr = addr
-
-    def rfc_compliant(s, encoding):
-        """Encode a header string into RFC-compliant format. Do not modify
-        string if is contains only ascii letters.
-        """
-        if contains_nonascii_characters(s):
-            return Header(s, encoding).encode()
-        return s
 
     try:
         nm = rfc_compliant(nm, encoding)
