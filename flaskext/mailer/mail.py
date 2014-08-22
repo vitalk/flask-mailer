@@ -23,6 +23,15 @@ def contains_nonascii_characters(raw):
     return not all(ord(c) < 128 for c in raw)
 
 
+def rfc_compliant(s, encoding):
+    """Encode a header string into RFC-compliant format. Do not modify
+    string if is contains only ascii letters.
+    """
+    if contains_nonascii_characters(s):
+        return Header(s, encoding).encode()
+    return s
+
+
 def sanitize_address(addr, encoding='utf-8'):
     """Sanitize email address into RFC 2822-compliant string.
 
@@ -36,14 +45,6 @@ def sanitize_address(addr, encoding='utf-8'):
         addr = parseaddr(addr)
     nm, addr = addr
 
-    def rfc_compliant(s, encoding):
-        """Encode a header string into RFC-compliant format. Do not modify
-        string if is contains only ascii letters.
-        """
-        if contains_nonascii_characters(s):
-            return Header(s, encoding).encode()
-        return s
-
     try:
         nm = rfc_compliant(nm, encoding)
     except UnicodeEncodeError:
@@ -54,7 +55,7 @@ def sanitize_address(addr, encoding='utf-8'):
     except UnicodeEncodeError:
         if '@' in addr:
             localpart, domain = addr.split('@', 1)
-            localpart = str(Header(localpart, encoding))
+            localpart = rfc_compliant(localpart, encoding)
             domain = domain.encode('idna').decode('ascii')
             addr = '@'.join([localpart, domain])
         else:
@@ -86,6 +87,38 @@ class Proxy(object):
 
     def __delete__(self, instance):
         setattr(instance, self.attribute_name, None)
+
+
+class SafeHeader(object):
+    """A wrapper for RFC 2822-compliant header.
+
+    >>> str(SafeHeader('Hello!'))
+    'Hello!'
+
+    Strips any newline characters to prevent header injection::
+
+    >>> str(SafeHeader('No \n\rmore header injection!'))
+    'No more header injection!'
+
+    Encode string if it contains nonascii characters::
+
+    >>> str(SafeHeader(u'Привет', encoding='cp1251'))
+    '=?cp1251?b?z/Do4uXy?='
+
+    :param value: The initial header value.
+    :param encoding: The character set that the header was encoded in.
+    """
+    def __init__(self, value='', encoding='utf-8'):
+        self.value = value
+        self.encoding = encoding
+
+    def __str__(self):
+        if isinstance(self.value, string_types):
+            return rfc_compliant(''.join(self.value.splitlines()), self.encoding)
+        return text_type(self.value)
+
+    def __nonzero__(self):
+        return isinstance(self.value, string_types) and bool(self.value)
 
 
 class Address(object):
@@ -205,6 +238,7 @@ class Email(object):
 
     """
 
+    subject = Proxy(SafeHeader, '_subject')
     from_addr = Proxy(Address, '_from_addr')
     reply_to = Proxy(Address, '_reply_to')
     bcc = Proxy(Addresses, '_bcc')
@@ -220,7 +254,7 @@ class Email(object):
                  bcc=None,
                  reply_to=None):
         self.text = text
-        self.subject = u' '.join(subject.splitlines())
+        self.subject = subject
         self.from_addr = from_addr
         self.to = to
         self.cc = cc
@@ -253,7 +287,7 @@ class Email(object):
 
         msg['From'] = text_type(self.from_addr)
         msg['To'] = self.to.format()
-        msg['Subject'] = utf8(self.subject)
+        msg['Subject'] = text_type(self.subject)
         msg['Content-Type'] = 'text/plain; charset=utf-8'
         msg['Content-Transfer-Encoding'] = '8bit'
 
