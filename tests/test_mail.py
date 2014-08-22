@@ -166,6 +166,16 @@ class TestSafeHeader(object):
 
 class TestMail:
 
+    def test_empty_mail(self):
+        mail = Email()
+        assert not mail.subject
+        assert not mail.text
+        assert not mail.from_addr
+        assert not mail.to
+        assert not mail.cc
+        assert not mail.bcc
+        assert not mail.reply_to
+
     def test_mail_init(self, mail):
         assert text_type(mail.subject) == 'Down the Rabbit-Hole'
         assert mail.text == 'What is the use of a book without pictures or conversation?'
