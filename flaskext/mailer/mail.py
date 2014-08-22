@@ -246,7 +246,7 @@ class Email(object):
     cc = Proxy(Addresses, '_cc')
 
     def __init__(self,
-                 subject,
+                 subject=None,
                  text='',
                  to=None,
                  from_addr=None,
