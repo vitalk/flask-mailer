@@ -89,6 +89,38 @@ class Proxy(object):
         setattr(instance, self.attribute_name, None)
 
 
+class SafeHeader(object):
+    """A wrapper for RFC 2822-compliant header.
+
+    >>> str(SafeHeader('Hello!'))
+    'Hello!'
+
+    Strips any newline characters to prevent header injection::
+
+    >>> str(SafeHeader('No \n\rmore header injection!'))
+    'No more header injection!'
+
+    Encode string if it contains nonascii characters::
+
+    >>> str(SafeHeader(u'Привет', encoding='cp1251'))
+    '=?cp1251?b?z/Do4uXy?='
+
+    :param value: The initial header value.
+    :param encoding: The character set that the header was encoded in.
+    """
+    def __init__(self, value='', encoding='utf-8'):
+        self.value = value
+        self.encoding = encoding
+
+    def __str__(self):
+        if isinstance(self.value, string_types):
+            return rfc_compliant(''.join(self.value.splitlines()), self.encoding)
+        return text_type(self.value)
+
+    def __nonzero__(self):
+        return isinstance(self.value, string_types) and bool(self.value)
+
+
 class Address(object):
     """A wrapper for email address.
 

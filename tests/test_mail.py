@@ -6,6 +6,8 @@ from flask.ext.mailer import Email
 from flask.ext.mailer.mail import Proxy
 from flask.ext.mailer.mail import Address
 from flask.ext.mailer.mail import Addresses
+from flask.ext.mailer.mail import SafeHeader
+from flask.ext.mailer.compat import text_type
 
 
 @pytest.fixture(params=[None, ''])
@@ -125,6 +127,41 @@ class TestAddresses(object):
     def test_append_named_address_to_list(self):
         self.addresses.append(['Alice', 'alice@example.com'])
         assert self.addresses.format() == 'Alice <alice@example.com>'
+
+
+class TestSafeHeader(object):
+
+    subject = Proxy(SafeHeader, '_subject')
+
+    def setup(self):
+        self.subject = SafeHeader()
+
+    def test_init(self):
+        assert self.subject.value == ''
+        assert self.subject.encoding == 'utf-8'
+
+    def test_string_representation(self):
+        assert text_type(self.subject) == ''
+        self.subject = 'Hello'
+        assert text_type(self.subject) == 'Hello'
+
+    def test_header_is_falsy_when_value_is_falsy(self, falsy):
+        self.subject = falsy
+        assert not self.subject
+
+    def test_header_is_truly_when_value_is_truly(self):
+        self.subject = 'Hello'
+        assert self.subject
+
+    def test_use_encoding_to_encode_nonascii_characters(self):
+        self.subject = u'Привет'
+        assert text_type(self.subject) == '=?utf-8?b?0J/RgNC40LLQtdGC?='
+        self.subject.encoding = 'cp1251'
+        assert text_type(self.subject) == '=?cp1251?b?z/Do4uXy?='
+
+    def test_prevent_header_injection(self):
+        self.subject = 'Hello\r\n'
+        assert text_type(self.subject) == 'Hello'
 
 
 class TestMail:
