@@ -167,7 +167,7 @@ class TestSafeHeader(object):
 class TestMail:
 
     def test_mail_init(self, mail):
-        assert mail.subject == 'Down the Rabbit-Hole'
+        assert text_type(mail.subject) == 'Down the Rabbit-Hole'
         assert mail.text == 'What is the use of a book without pictures or conversation?'
         assert mail.from_addr == 'Alice from Wonderland <alice@wonderland.com>'
         assert mail.to == ['one@example.com', 'two@example.com']
@@ -255,6 +255,8 @@ class TestMail:
         assert message['Content-Transfer-Encoding'] == '8bit'
 
     def test_mail_contains_nonascii_characters(self, mail):
+        mail.subject = u'Привет'
+        assert 'Subject: =?utf-8?b?0J/RgNC40LLQtdGC?=' in mail.format()
         mail.from_addr = (u'Álice', u'álice@example.com')
         assert 'From: =?utf-8?b?w4FsaWNl?= <=?utf-8?b?w6FsaWNl?=@example.com>' in mail.format()
         mail.cc = (u'ćć', 'cc@example.com')

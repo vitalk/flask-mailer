@@ -238,6 +238,7 @@ class Email(object):
 
     """
 
+    subject = Proxy(SafeHeader, '_subject')
     from_addr = Proxy(Address, '_from_addr')
     reply_to = Proxy(Address, '_reply_to')
     bcc = Proxy(Addresses, '_bcc')
@@ -253,7 +254,7 @@ class Email(object):
                  bcc=None,
                  reply_to=None):
         self.text = text
-        self.subject = u' '.join(subject.splitlines())
+        self.subject = subject
         self.from_addr = from_addr
         self.to = to
         self.cc = cc
@@ -286,7 +287,7 @@ class Email(object):
 
         msg['From'] = text_type(self.from_addr)
         msg['To'] = self.to.format()
-        msg['Subject'] = utf8(self.subject)
+        msg['Subject'] = text_type(self.subject)
         msg['Content-Type'] = 'text/plain; charset=utf-8'
         msg['Content-Transfer-Encoding'] = '8bit'
 
