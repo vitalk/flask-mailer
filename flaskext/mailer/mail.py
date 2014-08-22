@@ -127,13 +127,13 @@ class Address(object):
     Perform sanitizing and formating email address. Formated address
     RFC 2822-compliant and suitable to use in internationalized email headers::
 
-    >>> Address(u'álice@example.com').format()
+    >>> str(Address(u'álice@example.com'))
     '=?utf-8?b?w6FsaWNl?=@example.com'
 
     If address consists of two-element list, they handled as the name, email
     address pair::
 
-    >>> Address(('Alice', 'alice@example.com')).format()
+    >>> str(Address(('Alice', 'alice@example.com')))
     'Alice <alice@example.com>'
 
     :param address: The email address
@@ -142,11 +142,8 @@ class Address(object):
     def __init__(self, address):
         self.address = address
 
-    def format(self):
-        return sanitize_address(self.address)
-
     def __str__(self):
-        return self.format()
+        return sanitize_address(self.address)
 
     def __unicode__(self):
         return utf8(str(self))
@@ -179,8 +176,8 @@ class Addresses(list):
 
     >>> cc = Addresses(('Alice', 'alice@example.com'))
     >>> cc.append(('Bob', 'bob@example.com'))
-    >>> cc.format()
-    u'Alice <alice@example.com>, Bob <bob@example.com>'
+    >>> str(cc)
+    'Alice <alice@example.com>, Bob <bob@example.com>'
 
     """
 
@@ -199,12 +196,8 @@ class Addresses(list):
 
         self.extend(values)
 
-    def format(self):
-        """Returns string suitable to use in mail header."""
-        return ', '.join(map(text_type, self))
-
     def __str__(self):
-        return self.format()
+        return ', '.join(map(text_type, self))
 
     def __unicode__(self):
         return utf8(str(self))
@@ -286,13 +279,13 @@ class Email(object):
         del msg['Content-Transfer-Encoding']
 
         msg['From'] = text_type(self.from_addr)
-        msg['To'] = self.to.format()
+        msg['To'] = text_type(self.to)
         msg['Subject'] = text_type(self.subject)
         msg['Content-Type'] = 'text/plain; charset=utf-8'
         msg['Content-Transfer-Encoding'] = '8bit'
 
         if self.cc:
-            msg['Cc'] = self.cc.format()
+            msg['Cc'] = text_type(self.cc)
 
         if self.reply_to:
             msg['Reply-To'] = text_type(self.reply_to)
