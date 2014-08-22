@@ -8,6 +8,11 @@ from flask.ext.mailer.mail import Address
 from flask.ext.mailer.mail import Addresses
 
 
+@pytest.fixture(params=[None, ''])
+def falsy(request):
+    return request.param
+
+
 @pytest.fixture
 def dummy():
     return Email('Subject', from_addr='from@example.com',
