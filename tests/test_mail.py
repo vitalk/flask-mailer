@@ -239,7 +239,7 @@ class TestMail:
         assert mail.send_to == ['bcc@example.com', 'hatter@wonderland.com', 'cc@example.com', 'one@example.com', 'two@example.com']
 
     def test_raises_error_if_mailing_parameters_is_blank(self):
-        mail = Email('Dummy mail')
+        mail = Email()
         with pytest.raises(RuntimeError) as err:
             mail.to_message()
             assert err.message == 'Fill in mailing parameters first'
