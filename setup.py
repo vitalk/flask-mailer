@@ -35,7 +35,7 @@ class pytest(Command):
 
 setup(
     name='Flask-Mailer',
-    version='0.3.0',
+    version='0.3.1',
     license='BSD',
     author='Vital Kudzelka',
     author_email='vital.kudzelka@gmail.com',
