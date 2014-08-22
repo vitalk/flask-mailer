@@ -5,7 +5,7 @@ from email.header import Header
 from email.utils import parseaddr
 from email.utils import formataddr
 
-from flaskext.mailer.compat import string_types, text_type
+from flaskext.mailer.compat import string_types, text_type, unicode_compatible
 
 
 def to_list(el):
@@ -89,6 +89,7 @@ class Proxy(object):
         setattr(instance, self.attribute_name, None)
 
 
+@unicode_compatible
 class SafeHeader(object):
     """A wrapper for RFC 2822-compliant header.
 
@@ -121,6 +122,7 @@ class SafeHeader(object):
         return isinstance(self.value, string_types) and bool(self.value)
 
 
+@unicode_compatible
 class Address(object):
     """A wrapper for email address.
 
@@ -145,9 +147,6 @@ class Address(object):
     def __str__(self):
         return sanitize_address(self.address)
 
-    def __unicode__(self):
-        return utf8(str(self))
-
     def __nonzero__(self):
         return bool(self.address)
 
@@ -168,6 +167,7 @@ class Address(object):
         return len(text_type(self))
 
 
+@unicode_compatible
 class Addresses(list):
     """A base class for email address list.
 
@@ -198,9 +198,6 @@ class Addresses(list):
 
     def __str__(self):
         return ', '.join(map(text_type, self))
-
-    def __unicode__(self):
-        return utf8(str(self))
 
     def append(self, value):
         return self.extend([value,])
