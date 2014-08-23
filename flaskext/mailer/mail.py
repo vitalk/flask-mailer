@@ -212,6 +212,7 @@ class Addresses(list):
         super(Addresses, self).extend(values)
 
 
+@unicode_compatible
 class Email(object):
     """Base class for email messages.
 
@@ -292,6 +293,9 @@ class Email(object):
     def format(self, sep='\r\n'):
         """Format message into a string."""
         return sep.join(self.to_message().as_string().splitlines())
+
+    def __str__(self):
+        return self.format(sep='\n')
 
 
 if __name__ == '__main__':
