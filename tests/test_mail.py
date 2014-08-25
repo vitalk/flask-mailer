@@ -42,17 +42,15 @@ class TestAddress:
 
     def test_address_init(self, alice):
         assert alice.address == 'alice@example.com'
-        assert alice.format() == 'alice@example.com'
-        assert unicode(alice) == u'alice@example.com'
-        assert str(alice) == 'alice@example.com'
+        assert text_type(alice) == 'alice@example.com'
 
     def test_unpack_address_from_list(self):
         addr = Address(['Alice', 'alice@example.com'])
-        assert addr.format() == u'Alice <alice@example.com>'
+        assert text_type(addr) == 'Alice <alice@example.com>'
 
     def test_unpack_address_from_tuple(self):
         addr = Address(('Alice', 'alice@example.com'))
-        assert addr.format() == u'Alice <alice@example.com>'
+        assert text_type(addr) == u'Alice <alice@example.com>'
 
     def test_compare_addresses(self, alice):
         assert alice == Address('alice@example.com')
@@ -76,11 +74,11 @@ class TestAddress:
 
     def test_encode_nonascii_strings(self):
         addr = Address((u'Álice', u'alice@example.com'))
-        assert addr.format() == '=?utf-8?b?w4FsaWNl?= <alice@example.com>'
+        assert text_type(addr) == '=?utf-8?b?w4FsaWNl?= <alice@example.com>'
 
     def test_strip_newlines_from_address(self):
         addr = Address(('Alice\n', 'alice\r\n@example.com\r'))
-        assert addr.format() == 'Alice <alice@example.com>'
+        assert text_type(addr) == 'Alice <alice@example.com>'
 
 
 class TestAddresses(object):
@@ -97,36 +95,36 @@ class TestAddresses(object):
         address = 'alice@example.com'
         self.addresses = address
         assert self.addresses == [address,]
-        assert self.addresses.format() == address
+        assert text_type(self.addresses) == address
 
     def test_assign_list_of_addresses(self):
         addresses = ['alice@example.com', 'bob@example.com']
         self.addresses = addresses
         assert self.addresses == addresses
-        assert self.addresses.format() == ', '.join(addresses)
+        assert text_type(self.addresses) == ', '.join(addresses)
 
     def test_assign_list_of_named_addresses(self):
         named_address = ('Alice', 'alice@example.com')
         self.addresses = [named_address,]
         assert self.addresses == [named_address,]
-        assert self.addresses.format() == 'Alice <alice@example.com>'
+        assert text_type(self.addresses) == 'Alice <alice@example.com>'
 
     def test_assign_address_instance(self, alice):
         self.addresses = alice
         assert self.addresses == [alice,]
-        assert self.addresses.format() == alice.format()
+        assert text_type(self.addresses) == text_type(alice)
 
     def test_append_value_to_list(self):
         self.addresses.append('alice@example.com')
-        assert self.addresses.format() == 'alice@example.com'
+        assert text_type(self.addresses) == 'alice@example.com'
 
     def test_append_address_instance_to_list(self, alice):
         self.addresses.append(alice)
-        assert self.addresses.format() == 'alice@example.com'
+        assert text_type(self.addresses) == 'alice@example.com'
 
     def test_append_named_address_to_list(self):
         self.addresses.append(['Alice', 'alice@example.com'])
-        assert self.addresses.format() == 'Alice <alice@example.com>'
+        assert text_type(self.addresses) == 'Alice <alice@example.com>'
 
 
 class TestSafeHeader(object):
@@ -266,18 +264,18 @@ class TestMail:
 
     def test_mail_contains_nonascii_characters(self, mail):
         mail.subject = u'Привет'
-        assert 'Subject: =?utf-8?b?0J/RgNC40LLQtdGC?=' in mail.format()
+        assert 'Subject: =?utf-8?b?0J/RgNC40LLQtdGC?=' in text_type(mail)
         mail.from_addr = (u'Álice', u'álice@example.com')
-        assert 'From: =?utf-8?b?w4FsaWNl?= <=?utf-8?b?w6FsaWNl?=@example.com>' in mail.format()
+        assert 'From: =?utf-8?b?w4FsaWNl?= <=?utf-8?b?w6FsaWNl?=@example.com>' in text_type(mail)
         mail.cc = (u'ćć', 'cc@example.com')
-        assert 'Cc: =?utf-8?b?xIfEhw==?= <cc@example.com>' in mail.format()
+        assert 'Cc: =?utf-8?b?xIfEhw==?= <cc@example.com>' in text_type(mail)
         mail.reply_to = (u'nóréply', 'noreply@example.com')
-        assert 'Reply-To: =?utf-8?b?bsOzcsOpcGx5?= <noreply@example.com>' in mail.format()
+        assert 'Reply-To: =?utf-8?b?bsOzcsOpcGx5?= <noreply@example.com>' in text_type(mail)
         mail.to = ['á <a@example.com>', u'ä <aa@example.com>']
-        assert 'To: =?utf-8?b?w6E=?= <a@example.com>, =?utf-8?b?w6Q=?= <aa@example.com>' in mail.format()
+        assert 'To: =?utf-8?b?w6E=?= <a@example.com>, =?utf-8?b?w6Q=?= <aa@example.com>' in text_type(mail)
 
     def test_mail_to_string(self, mail):
-        assert mail.format(sep='\n') == '''\
+        assert text_type(mail) == '''\
 MIME-Version: 1.0
 From: Alice from Wonderland <alice@wonderland.com>
 To: one@example.com, two@example.com

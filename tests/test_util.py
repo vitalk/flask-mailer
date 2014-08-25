@@ -7,11 +7,29 @@ from flask.ext.mailer.util import key
 from flask.ext.mailer.util import get_config
 from flask.ext.mailer.util import import_path
 from flask.ext.mailer.util import strip_prefix
+from flask.ext.mailer.compat import unicode_compatible
+
 
 @pytest.fixture
 def config(app):
     Mailer(app)
     return app.config
+
+
+class TestUnicodeCompatibleDecorator:
+
+    def test_decorator_defines__unicode__method(self):
+        @unicode_compatible
+        class Foo:
+            def __str__(self):
+                return '42'
+
+        assert Foo().__unicode__() == Foo().__str__() == '42'
+
+    def test_raises_value_error_if_class_does_not_define__str__method(self):
+        with pytest.raises(ValueError):
+            @unicode_compatible
+            class Foo: pass
 
 
 def test_attach_prefix_to_key():
