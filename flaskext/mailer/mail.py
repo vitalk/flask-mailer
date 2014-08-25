@@ -238,7 +238,7 @@ class Email(object):
 
     def __init__(self,
                  subject=None,
-                 text='',
+                 text=None,
                  to=None,
                  from_addr=None,
                  cc=None,
