@@ -267,7 +267,7 @@ class Email(object):
         """Returns the email as MIMEText object."""
         if not self.text or not self.subject or \
            not self.to or not self.from_addr:
-            raise RuntimeError('Fill in mailing parameters first')
+            raise ValueError('Fill in mailing parameters first')
 
         msg = MIMEText(utf8(self.text))
 
