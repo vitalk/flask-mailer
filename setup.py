@@ -14,6 +14,9 @@ import subprocess
 from setuptools import setup, Command
 
 
+__version__ = '0.3.4'
+
+
 class pytest(Command):
     user_options = [
         ('coverage', None, 'report coverage')
@@ -35,7 +38,7 @@ class pytest(Command):
 
 setup(
     name='Flask-Mailer',
-    version='0.3.4',
+    version=__version__,
     license='BSD',
     author='Vital Kudzelka',
     author_email='vital.kudzelka@gmail.com',
