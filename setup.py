@@ -11,7 +11,7 @@
 """
 import sys
 import subprocess
-from setuptools import setup, Command
+from setuptools import find_packages, setup, Command
 
 
 __version__ = '0.3.4'
@@ -43,16 +43,19 @@ setup(
     author='Vital Kudzelka',
     author_email='vital.kudzelka@gmail.com',
     description='A Flask extension for sending emails with pluggable backends.',
+    url='https://github.com/vitalk/flask-mailer',
+    download_url='https://github.com/vitalk/flask-mailer/tarball/%s' % __version__,
     long_description=__doc__,
-    packages=[
-        'flaskext',
-        'flaskext.mailer'
-    ],
+    packages=find_packages(exclude=['tests']),
     namespace_packages=['flaskext'],
     install_requires=['Flask'],
     tests_require=['pytest', 'pytest-cov'],
     cmdclass={'test': pytest},
+    zip_safe=False,
+    platforms='any',
+    keywords='flask mail smtp',
     classifiers=[
+        'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
