@@ -1,13 +1,19 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-    Flask-Mailer
-    ~~~~~~~~~~~~
+Flask-Mailer
+============
 
-    A Flask extension for sending emails with pluggable backends.
+A Flask extension for sending email messages with pluggable backends
+and pythonic API.
 
-    :copyright: (c) by Vital Kudzelka
-    :license: BSD
+Contributing
+------------
+
+Don't hesitate to create a `GitHub issue
+<https://github.com/vitalk/flask-mailer/issues>`_ for any **bug** or
+**suggestion**.
+
 """
 import sys
 import subprocess
