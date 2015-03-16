@@ -4,6 +4,7 @@ import socket
 from smtplib import SMTP, SMTPException
 
 from flaskext.mailer.backends.base import Mailer
+from flaskext.mailer.compat import text_type
 
 
 class SMTPMailer(Mailer):
@@ -60,8 +61,8 @@ class SMTPMailer(Mailer):
         """Send the message."""
         with self as con:
             message.from_addr = message.from_addr or self.default_sender
-            con.sendmail(message.from_addr,
-                         message.send_to,
+            con.sendmail(text_type(message.from_addr),
+                         text_type(message.send_to),
                          message.format())
 
     def send_quiet(self, message):
