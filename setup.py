@@ -15,12 +15,28 @@ Don't hesitate to create a `GitHub issue
 **suggestion**.
 
 """
+import io
+import os
+import re
 import sys
 import subprocess
 from setuptools import find_packages, setup, Command
 
 
-__version__ = '0.3.5'
+def read(*parts):
+    try:
+        return io.open(os.path.join(*parts), 'r', encoding='utf-8').read()
+    except IOError:
+        return b''
+
+
+def get_version():
+    version_file = read('flaskext', 'mailer', '__init__.py')
+    version_match = re.search(r'^__version__ = [\'"]([^\'"]*)[\'"]',
+                              version_file, re.MULTILINE)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError('Unable to find version string.')
 
 
 class pytest(Command):
@@ -40,6 +56,9 @@ class pytest(Command):
             basecmd += ['--cov', 'flaskext/mailer']
         errno = subprocess.call(basecmd + ['tests'])
         raise SystemExit(errno)
+
+
+__version__ = get_version()
 
 
 setup(
