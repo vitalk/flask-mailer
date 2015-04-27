@@ -8,7 +8,7 @@ from flask_mailer.util import get_config
 from flask_mailer.util import import_path
 
 
-__version__ = '0.3.7'
+__version__ = '0.4.0'
 __all__ = ('get_mailer', 'send_email', 'Mailer', 'Email')
 
 
