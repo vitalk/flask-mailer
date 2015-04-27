@@ -3,7 +3,7 @@
 import pytest
 
 from flask import Flask
-from flask.ext.mailer.util import key
+from flask_mailer.util import key
 
 
 def create_app(**options):

@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 from flask import current_app
 
-from flaskext.mailer.mail import Email
-from flask.ext.mailer.util import key
-from flask.ext.mailer.util import get_config
-from flask.ext.mailer.util import import_path
+from flask_mailer.mail import Email
+from flask_mailer.util import key
+from flask_mailer.util import get_config
+from flask_mailer.util import import_path
 
 
 __version__ = '0.3.7'
@@ -63,11 +63,11 @@ class Mailer(object):
         config.setdefault(key('username'), None)
         config.setdefault(key('password'), None)
         config.setdefault(key('default_sender'), 'webmaster')
-        config.setdefault(key('backend'), 'flask.ext.mailer.backends.smtp.SMTPMailer')
+        config.setdefault(key('backend'), 'flask_mailer.backends.smtp.SMTPMailer')
 
         # use dummy mailer for testing config
         if config[key('testing')]:
-            config[key('backend')] = 'flask.ext.mailer.backends.dummy.DummyMailer'
+            config[key('backend')] = 'flask_mailer.backends.dummy.DummyMailer'
 
         state = init_mailer(config)
 

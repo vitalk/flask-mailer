@@ -2,7 +2,7 @@
 # -*- config coding: utf-8 -*-
 from werkzeug.utils import import_string
 
-from flask.ext.mailer.compat import iteritems
+from flask_mailer.compat import iteritems
 
 
 def key(name): return ('MAILER_%s' % name).upper()

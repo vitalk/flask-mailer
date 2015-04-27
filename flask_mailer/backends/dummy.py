@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from flaskext.mailer.backends.base import Mailer
+from flask_mailer.backends.base import Mailer
 
 
 class DummyMailer(Mailer):

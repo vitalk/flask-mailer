@@ -19,14 +19,14 @@ PREFIX_PORT:            mailer port, default 25
 PREFIX_USERNAME:        username for backend, default None
 PREFIX_PASSWORD:        password for backend, default None
 PREFIX_DEFAULT_SENDER:  mailer default sender, default 'webmaster'
-PREFIX_BACKEND:         mailer backend, default 'flaskext.mailer.backends.smtp.SMTPMailer'
+PREFIX_BACKEND:         mailer backend, default 'flask_mailer.backends.smtp.SMTPMailer'
 PREFIX_TESTING:         enable dummy backend for testing, default same as the
                         app.testing
 
 Setup mailer instance:
 
 from flask import Flask
-from flaskext.mailer import Mailer
+from flask_mailer import Mailer
 
 app = Flask(__name__)
 mailer = Mailer(app)
@@ -43,7 +43,7 @@ SENDING EMAILS
 If you set 'DEFAULT_SENDER' on config then you don't need to set mail sender
 explicitly.
 
-from flaskext.mailer.mail import Email
+from flask_mailer.mail import Email
 mail = Email('hi, there', 'awesome message',
              to=['to@example.com', 'you@example.com'],
              from_addr='me@example.com')
@@ -57,7 +57,7 @@ assert mail.from_addr == 'me <me@example.com>'
 
 And finally send mail:
 
-from flaskext.mailer import get_mailer
+from flask_mailer import get_mailer
 mailer = get_mailer()
 mailer.send(mail)
 
@@ -68,7 +68,7 @@ mailer.send_quiet(mail)
 
 It is possible to send mail with previously registered mailer with shortcut:
 
-from flaskext.mailer import send_email
+from flask_mailer import send_email
 send_email('hi', 'awesome message', 'to@example.com')
 
 TESTING
@@ -77,7 +77,7 @@ Setting to your app 'testing' flag automatically enable the dummy mailer
 backend or you can manually set 'MAILER_TESTING' to True.  On dummy mailer all
 mails on send just append to outbox list:
 
-from flaskext.mailer import get_mailer
+from flask_mailer import get_mailer
 
 mailer = get_mailer()
 mail = Email('testing', 'awesome message', 'to@example.com', 'from@example.com')

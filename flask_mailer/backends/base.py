@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from flaskext.mailer import key
+from flask_mailer import key
 
 
 class Mailer(object):

@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from flask.ext.mailer.backends.base import Mailer
-from flask.ext.mailer.backends.smtp import SMTPMailer
-from flask.ext.mailer.backends.dummy import DummyMailer
+from flask_mailer.backends.base import Mailer
+from flask_mailer.backends.smtp import SMTPMailer
+from flask_mailer.backends.dummy import DummyMailer
 
 from .test_mail import mail
 

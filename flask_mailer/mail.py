@@ -5,7 +5,7 @@ from email.header import Header
 from email.utils import parseaddr
 from email.utils import formataddr
 
-from flaskext.mailer.compat import string_types, text_type, unicode_compatible
+from flask_mailer.compat import string_types, text_type, unicode_compatible
 
 
 def to_list(el):

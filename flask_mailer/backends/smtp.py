@@ -3,8 +3,8 @@
 import socket
 from smtplib import SMTP, SMTPException
 
-from flaskext.mailer.backends.base import Mailer
-from flaskext.mailer.compat import text_type
+from flask_mailer.backends.base import Mailer
+from flask_mailer.compat import text_type
 
 
 class SMTPMailer(Mailer):
