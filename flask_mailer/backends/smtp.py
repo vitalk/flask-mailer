@@ -26,7 +26,10 @@ class SMTPMailer(Mailer):
 
         auth = (username, password)
         if any(auth) and not all(auth):
-            raise RuntimeError('Please setup both USERNAME and PASSWORD or neither')
+            raise RuntimeError(
+                'Invalid credentials. Please setup both username and '
+                'password or neither.'
+            )
 
     def __enter__(self):
         """Acquires the connection to SMTP server."""
