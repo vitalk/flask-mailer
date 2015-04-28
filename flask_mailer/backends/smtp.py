@@ -3,6 +3,7 @@
 import socket
 from smtplib import SMTP
 from smtplib import SMTPException
+import warnings
 
 from flask_mailer.backends.base import Mailer
 from flask_mailer.compat import text_type
@@ -25,12 +26,13 @@ class SMTPMailer(Mailer):
         self.password = password
         self.default_sender = default_sender
 
-        auth = (username, password)
-        if any(auth) and not all(auth):
-            raise RuntimeError(
+        credentials = (username, password)
+        if any(credentials) and not all(credentials):
+            warnings.warn(
                 'Invalid credentials. Please setup both username and '
                 'password or neither.'
             )
+            self.username = self.password = None
 
     def __enter__(self):
         """Acquires the connection to SMTP server."""

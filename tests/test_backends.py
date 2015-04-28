@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
+from flask_mailer.compat import text_type
 from flask_mailer.backends.base import Mailer
 from flask_mailer.backends.smtp import SMTPMailer
 from flask_mailer.backends.dummy import DummyMailer
@@ -39,14 +40,24 @@ def test_dummy_mailer_push_send_messages_into_outbox(dummy, mail):
     assert dummy.outbox == [mail,]
 
 
-def test_smtp_raises_error_on_missed_password():
-    with pytest.raises(RuntimeError):
-        SMTPMailer(username='me')
+def test_smtp_missed_password(recwarn):
+    smtp = SMTPMailer(username='me')
+    w = recwarn.pop()
+    assert text_type(w.message) == (
+        'Invalid credentials. Please setup both username and '
+        'password or neither.'
+    )
+    assert smtp.username is None
 
 
-def test_smtp_raises_error_on_missed_username():
-    with pytest.raises(RuntimeError):
-        SMTPMailer(password='pass')
+def test_smtp_missed_password(recwarn):
+    smtp = SMTPMailer(password='pass')
+    w = recwarn.pop()
+    assert text_type(w.message) == (
+        'Invalid credentials. Please setup both username and '
+        'password or neither.'
+    )
+    assert smtp.password is None
 
 
 def test_smtp_default_options(smtp):
