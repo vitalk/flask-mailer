@@ -9,20 +9,22 @@ from flask_mailer.util import import_path
 
 
 __version__ = '0.4.0'
-__all__ = ('get_mailer', 'send_email', 'Mailer', 'Email')
+__all__ = ('send_email', 'Mailer', 'Email')
 
 
 def send_email(subject, text, to, fail_quiet=True):
     """Send an email."""
-    mailer = get_mailer(None)
+    mailer = _get_mailer()
     mail = Email(subject, text, to)
     if fail_quiet:
         return mailer.send_quiet(mail)
     return mailer.send(mail)
 
 
-def get_mailer(state):
-    """Returns mailer for current app or raise RuntimeError."""
+def _get_mailer(state=None):
+    """Try to get mailer instance registered to with current application and
+    raise error otherwise.
+    """
     app = getattr(state, 'app', None) or current_app
 
     if not hasattr(app, 'extensions') or \
@@ -35,27 +37,15 @@ def get_mailer(state):
     return app.extensions['mailer']
 
 
-def init_mailer(options=None):
-    """Create a new mailer from options."""
-    options = get_config(options or {})
-
-    path = options.pop('backend', None)
-    backend_class = import_path(path)
-    if backend_class is None:
-        raise RuntimeError("Invalid backend: '%s'" % path)
-
-    return backend_class(**options)
-
-
 class Mailer(object):
     """Mailer instance manages sending of email messages."""
 
     def __init__(self, app=None):
         self.app = app
-        self.state = None if app is None else self.init_app(app)
+        if app is not None:
+            self.init_app(app)
 
     def init_app(self, app):
-        # set default settings
         config = app.config
         config.setdefault(key('testing'), app.testing)
         config.setdefault(key('host'), 'localhost')
@@ -66,19 +56,30 @@ class Mailer(object):
         config.setdefault(key('default_sender'), 'webmaster')
         config.setdefault(key('backend'), 'flask_mailer.backends.smtp.SMTPMailer')
 
-        # use dummy mailer for testing config
+        # Use dummy mailer for testing application.
         if config[key('testing')]:
             config[key('backend')] = 'flask_mailer.backends.dummy.DummyMailer'
 
-        state = init_mailer(config)
+        state = self.init_backend(config)
 
-        # register extension themselves for backwards compatibility
+        # Register extension themselves for backwards compatibility.
         app.extensions = getattr(app, 'extensions', {})
         app.extensions['mailer'] = state
         return state
 
+    def init_backend(self, options=None):
+        """Use options to create a new mailer backend."""
+        options = get_config(options or {})
+
+        backend_path = options.pop('backend', None)
+        backend_class = import_path(backend_path)
+        if backend_class is None:
+            raise RuntimeError("Invalid backend: '%s'" % backend_path)
+
+        return backend_class(**options)
+
     def __getattr__(self, name):
-        return getattr(get_mailer(self), name, None)
+        return getattr(_get_mailer(self), name, None)
 
 
 if __name__ == '__main__':

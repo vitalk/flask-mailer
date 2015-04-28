@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import socket
-from smtplib import SMTP, SMTPException
+from smtplib import SMTP
+from smtplib import SMTPException
 
 from flask_mailer.backends.base import Mailer
 from flask_mailer.compat import text_type
