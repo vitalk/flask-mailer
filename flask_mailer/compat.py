@@ -21,9 +21,10 @@ else:
         decorated class.
         """
         if '__str__' not in cls.__dict__:
-            raise ValueError('decorator cannot be applied to %s '
-                             'because it does not define __str__ method' %
-                             cls.__name__)
+            raise ValueError(
+                'decorator cannot be applied to %s '
+                'because it does not define __str__ method' % cls.__name__
+            )
         cls.__unicode__ = cls.__str__
         cls.__str__ = lambda x: x.__unicode__().encode('utf-8')
         return cls

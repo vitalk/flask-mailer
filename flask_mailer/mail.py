@@ -157,8 +157,10 @@ class Address(object):
             return text_type(self) == obj
         elif isinstance(obj, (list, tuple)):
             return text_type(self) == Address(obj)
-        raise NotImplementedError('Unable to compare Address instance '
-                                  'against {} instance'.format(type(obj)))
+        raise NotImplementedError(
+            'Unable to compare Address instance against '
+            '{} instance'.format(type(obj))
+        )
 
     def __ne__(self, obj):
         return not self == obj
