@@ -70,10 +70,10 @@ Thanks
 The extension inspired and partially reuse the code of the some awesome
 projects, such as:
 
-- Flask-Mail
-- Django
-- plurk
-- reddit
+- [Flask-Mail](https://github.com/mattupstate/flask-mail)
+- [Django](https://github.com/django/django)
+- [Solace](https://github.com/Plurk/Solace)
+- [reddit](https://github.com/reddit/reddit)
 
 Special thanks to their authors and contributors.
 
