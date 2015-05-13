@@ -98,7 +98,7 @@ class SafeHeader(object):
 
     Strips any newline characters to prevent header injection::
 
-    >>> str(SafeHeader('No \n\rmore header injection!'))
+    >>> str(SafeHeader('No \\n\\rmore header injection!'))
     'No more header injection!'
 
     Encode string if it contains nonascii characters::
@@ -130,7 +130,7 @@ class Address(object):
     RFC 2822-compliant and suitable to use in internationalized email headers::
 
     >>> str(Address(u'álice@example.com'))
-    '=?utf-8?b?w6FsaWNl?=@example.com'
+    '=?utf-8?b?w4PCoWxpY2U=?=@example.com'
 
     If address consists of two-element list, they handled as the name, email
     address pair::
@@ -224,13 +224,13 @@ class Email(object):
     ...    to=['to@example.com', 'you@example.com'],
     ...    from_addr='me@example.com'
     ... )
-    >>> msg = mail.to_message()
-    >>> msg['From']
-    'me@example.com'
-    >>> msg['To']
-    'to@example.com, you@example.com'
-    >>> msg['Subject']
-    'hello, there'
+    >>> message = mail.to_message()
+    >>> message['From']
+    u'me@example.com'
+    >>> message['To']
+    u'to@example.com, you@example.com'
+    >>> message['Subject']
+    u'hello, there'
 
     """
 
