@@ -218,9 +218,12 @@ class Addresses(list):
 class Email(object):
     """Base class for email messages.
 
-    >>> mail = Email('hello, there', 'awesome message',
-    ...              ['to@example.com', 'you@example.com'],
-    ...              'me@example.com')
+    >>> mail = Email(
+    ...    subject='hello, there',
+    ...    text='awesome message',
+    ...    to=['to@example.com', 'you@example.com'],
+    ...    from_addr='me@example.com'
+    ... )
     >>> msg = mail.to_message()
     >>> msg['From']
     'me@example.com'

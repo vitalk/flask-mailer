@@ -42,9 +42,12 @@ from flask_mailer import Mailer, Email
 app = Flask(__name__)
 smtp = Mailer(app)
 
-mail = Email('hi, there', 'awesome message',
-             to=['to@example.com', 'you@example.com'],
-             from_addr='me@example.com')
+mail = Email(
+    subject='hi, there',
+    text='awesome message',
+    to=['to@example.com', 'you@example.com'],
+    from_addr='me@example.com'
+)
 smtp.send(mail)
 ```
 
