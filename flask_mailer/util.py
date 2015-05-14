@@ -26,8 +26,10 @@ def get_config(config):
     :param config: The config dictionary to inspect.
     """
     prefix = 'MAILER_'
-    return {strip_prefix(prefix, name).lower(): value
-            for name, value in iteritems(config) if name.startswith(prefix) }
+    return dict(
+        (strip_prefix(prefix, name).lower(), value)
+        for name, value in iteritems(config) if name.startswith(prefix)
+    )
 
 
 def import_path(path):
