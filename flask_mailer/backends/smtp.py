@@ -1,10 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import socket
-from smtplib import SMTP, SMTPException
+from smtplib import SMTP
+from smtplib import SMTPException
+import warnings
 
-from flaskext.mailer.backends.base import Mailer
-from flaskext.mailer.compat import text_type
+from flask_mailer.backends.base import Mailer
+from flask_mailer.compat import text_type
 
 
 class SMTPMailer(Mailer):
@@ -24,9 +26,13 @@ class SMTPMailer(Mailer):
         self.password = password
         self.default_sender = default_sender
 
-        auth = (username, password)
-        if any(auth) and not all(auth):
-            raise RuntimeError('Please setup both USERNAME and PASSWORD or neither')
+        credentials = (username, password)
+        if any(credentials) and not all(credentials):
+            warnings.warn(
+                'Invalid credentials. Please setup both username and '
+                'password or neither.'
+            )
+            self.username = self.password = None
 
     def __enter__(self):
         """Acquires the connection to SMTP server."""

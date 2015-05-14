@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from flask.ext.mailer import Email
-from flask.ext.mailer.mail import Proxy
-from flask.ext.mailer.mail import Address
-from flask.ext.mailer.mail import Addresses
-from flask.ext.mailer.mail import SafeHeader
-from flask.ext.mailer.compat import text_type
+from flask_mailer import Email
+from flask_mailer.mail import Proxy
+from flask_mailer.mail import Address
+from flask_mailer.mail import Addresses
+from flask_mailer.mail import SafeHeader
+from flask_mailer.compat import text_type
 
 
 @pytest.fixture(params=[None, ''])

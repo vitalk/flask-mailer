@@ -5,7 +5,7 @@ from email.header import Header
 from email.utils import parseaddr
 from email.utils import formataddr
 
-from flaskext.mailer.compat import string_types, text_type, unicode_compatible
+from flask_mailer.compat import string_types, text_type, unicode_compatible
 
 
 def to_list(el):
@@ -98,7 +98,7 @@ class SafeHeader(object):
 
     Strips any newline characters to prevent header injection::
 
-    >>> str(SafeHeader('No \n\rmore header injection!'))
+    >>> str(SafeHeader('No \\n\\rmore header injection!'))
     'No more header injection!'
 
     Encode string if it contains nonascii characters::
@@ -130,7 +130,7 @@ class Address(object):
     RFC 2822-compliant and suitable to use in internationalized email headers::
 
     >>> str(Address(u'álice@example.com'))
-    '=?utf-8?b?w6FsaWNl?=@example.com'
+    '=?utf-8?b?w4PCoWxpY2U=?=@example.com'
 
     If address consists of two-element list, they handled as the name, email
     address pair::
@@ -157,8 +157,10 @@ class Address(object):
             return text_type(self) == obj
         elif isinstance(obj, (list, tuple)):
             return text_type(self) == Address(obj)
-        raise NotImplementedError('Unable to compare Address instance '
-                                  'against {} instance'.format(type(obj)))
+        raise NotImplementedError(
+            'Unable to compare Address instance against '
+            '{} instance'.format(type(obj))
+        )
 
     def __ne__(self, obj):
         return not self == obj
@@ -216,16 +218,19 @@ class Addresses(list):
 class Email(object):
     """Base class for email messages.
 
-    >>> mail = Email('hello, there', 'awesome message',
-    ...              ['to@example.com', 'you@example.com'],
-    ...              'me@example.com')
-    >>> msg = mail.to_message()
-    >>> msg['From']
-    'me@example.com'
-    >>> msg['To']
-    'to@example.com, you@example.com'
-    >>> msg['Subject']
-    'hello, there'
+    >>> mail = Email(
+    ...    subject='hello, there',
+    ...    text='awesome message',
+    ...    to=['to@example.com', 'you@example.com'],
+    ...    from_addr='me@example.com'
+    ... )
+    >>> message = mail.to_message()
+    >>> message['From']
+    u'me@example.com'
+    >>> message['To']
+    u'to@example.com, you@example.com'
+    >>> message['Subject']
+    u'hello, there'
 
     """
 

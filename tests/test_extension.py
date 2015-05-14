@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from flask.ext.mailer import Mailer
-from flask.ext.mailer import send_email
-from flask.ext.mailer.util import key
+from flask_mailer import Mailer
+from flask_mailer import send_email
+from flask_mailer.util import key
 
 from .test_mail import mail
 
@@ -21,7 +21,7 @@ def test_extension_register_themself_in_app(dummy, app):
 @pytest.mark.config(backend='no.such.backend')
 def test_force_use_dummy_mailer_in_test_enviroment(app):
     Mailer(app)
-    assert app.config[key('backend')] == 'flask.ext.mailer.backends.dummy.DummyMailer'
+    assert app.config[key('backend')] == 'flask_mailer.backends.dummy.DummyMailer'
 
 
 @pytest.mark.app(testing=False)
@@ -29,7 +29,7 @@ def test_force_use_dummy_mailer_in_test_enviroment(app):
 @pytest.mark.config(backend='wtf')
 def test_extension_config_overrides_application_config(app):
     Mailer(app)
-    assert app.config[key('backend')] == 'flask.ext.mailer.backends.dummy.DummyMailer'
+    assert app.config[key('backend')] == 'flask_mailer.backends.dummy.DummyMailer'
 
 
 @pytest.mark.config(testing=False)

@@ -2,7 +2,7 @@
 # -*- config coding: utf-8 -*-
 from werkzeug.utils import import_string
 
-from flask.ext.mailer.compat import iteritems
+from flask_mailer.compat import iteritems
 
 
 def key(name): return ('MAILER_%s' % name).upper()
@@ -26,8 +26,10 @@ def get_config(config):
     :param config: The config dictionary to inspect.
     """
     prefix = 'MAILER_'
-    return {strip_prefix(prefix, name).lower(): value
-            for name, value in iteritems(config) if name.startswith(prefix) }
+    return dict(
+        (strip_prefix(prefix, name).lower(), value)
+        for name, value in iteritems(config) if name.startswith(prefix)
+    )
 
 
 def import_path(path):

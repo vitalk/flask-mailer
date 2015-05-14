@@ -31,7 +31,7 @@ def read(*parts):
 
 
 def get_version():
-    version_file = read('flaskext', 'mailer', '__init__.py')
+    version_file = read('flask_mailer', '__init__.py')
     version_match = re.search(r'^__version__ = [\'"]([^\'"]*)[\'"]',
                               version_file, re.MULTILINE)
     if version_match:
@@ -53,7 +53,7 @@ class pytest(Command):
     def run(self):
         basecmd = [sys.executable, '-m', 'pytest']
         if self.coverage:
-            basecmd += ['--cov', 'flaskext/mailer']
+            basecmd += ['--cov', 'flask_mailer']
         errno = subprocess.call(basecmd + ['tests'])
         raise SystemExit(errno)
 
@@ -72,7 +72,6 @@ setup(
     download_url='https://github.com/vitalk/flask-mailer/tarball/%s' % __version__,
     long_description=__doc__,
     packages=find_packages(exclude=['tests']),
-    namespace_packages=['flaskext'],
     install_requires=['Flask'],
     tests_require=['pytest', 'pytest-cov'],
     cmdclass={'test': pytest},

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from flask.ext.mailer.mail import Proxy
+from flask_mailer.mail import Proxy
 
 
 class Foo(object):
